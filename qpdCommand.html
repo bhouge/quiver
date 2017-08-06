@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>PLOUGHMAN COMMAND CENTER</title>
+<title>QPD COMMAND CENTER</title>
 <style>
 	body { font: 13px Helvetica, Arial; }
 	button {
@@ -112,7 +112,7 @@ function textFieldChangeValuePercent(sender) {
 }
 
 function emitControlMessage(cm) {
-	socket.emit('control message', '/ploughman' + cm);
+	socket.emit('control message', '/qpd' + cm);
 	console.log(cm);
 }
 </script>

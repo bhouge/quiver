@@ -134,8 +134,10 @@ socket.on('audio', function(msg){
     console.log('audio received!');
     audioCtx.decodeAudioData(msg.buffer, function(buffer) {
     	audioBuffers[msg.index] = buffer;
+    	console.log('buffer ' + msg.index + ' loaded');
     	audioFilesToReceive--;
     	if (audioFilesToReceive <= 0) {
+    		console.log('all buffers loaded');
     		buffersAreLoaded = true;
         	listenButton.innerHTML = 'LISTEN';
     	}

@@ -17,7 +17,8 @@ var mysteryUserCount = 0;
 
 var fileNames = ["BowedVibesC#5d.mp3",
                    "CL_Swell_B4.mp3",
-                   "Kora1_F3_a.mp3"];
+                   "Kora1_F3_a.mp3",
+                   "windchimes.mp3"];
 
 /*
 var birdFileNames = [
