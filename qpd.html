@@ -33,7 +33,7 @@ The term gastromorphology may be used to describe a meal as a function of time.
 
 <div id="controlButtons">
 First Course:
-<button id="listen" class="off">LOADING...</button>
+<button id="course1" class="off">LOADING...</button>
 <br><br>
 Second Course:
 <button id="course2" class="off">LOADING...</button>
@@ -52,7 +52,7 @@ This web page will also work on a laptop (in which case inverting the device is 
 </h3>
 
 <script src="/socket.io/socket.io.js"></script>
-
+<script src="scripts/IntermittentSound.js"></script>
 
 <script type="text/javascript">
 
@@ -139,7 +139,10 @@ socket.on('audio', function(msg){
     	if (audioFilesToReceive <= 0) {
     		console.log('all buffers loaded');
     		buffersAreLoaded = true;
-        	listenButton.innerHTML = 'LISTEN';
+    		for (var i = 0; i < numberOfButtons; i++) {
+    			var courseButton = document.getElementById('course' + (i + 1));
+    			courseButton.innerHTML = 'LISTEN';
+    		}
     	}
       }, 
       function(error) {
@@ -164,6 +167,8 @@ var birdVariations = 0;
 
 var audioFilesToReceive = 0;
 
+var numberOfButtons = 3;
+
 
 function playSound(index) {
 	var source = audioCtx.createBufferSource();
@@ -175,23 +180,143 @@ function playSound(index) {
 }
 
 
+//gotta rethink this fo sho
 var listenButtonEnabled = true;
 var isChirping = false;
-var listenButton = document.getElementById('listen');
-listenButton.onclick = function() {
-	if (buffersAreLoaded) {
-		if (!isChirping) {
-			chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
-			chirp();
-			isChirping = true;
-			listenButton.innerHTML = 'STOP LISTENING';
+//var listenButton = document.getElementById('listen');
+
+var course1Button = document.getElementById('course1');
+var course2Button = document.getElementById('course2');
+var course3Button = document.getElementById('course3');
+
+course1Button.onclick = course1ButtonPressed;
+course2Button.onclick = course2ButtonPressed;
+course3Button.onclick = course3ButtonPressed;
+
+/*
+var buttons = document.getElementById("controlButtons");
+
+for (var i = 0; i < numberOfButtons; i++) {
+	var button = document.createElement("button");
+	button.setAttribute("class", "off");
+	button.setAttribute("id", "course" + i + 1);
+	button.innerHTML = 'LOADING...';
+	button.onclick = function() {
+		if (buffersAreLoaded) {
+			if (!isChirping) {
+				chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
+				chirp(i);
+				isChirping = true;
+				this.innerHTML = 'STOP LISTENING';
+			} else {
+				window.clearTimeout(timerID);
+				isChirping = false;
+				this.innerHTML = 'LISTEN';
+			}
+		}
+	};
+	var buttonDescriptor = document.createTextNode("Course " + i + ":"); 
+	var br = document.createElement("br");
+	//evidently you can only append an element once? therefore I am creating two br elements
+	var br2 = document.createElement("br");
+	buttons.appendChild(buttonDescriptor); 
+	buttons.appendChild(br);
+	buttons.appendChild(button);
+	if (i < numberOfButtons - 1) {
+		buttons.appendChild(br2);
+	}
+	
+	
+	button.setAttribute("disabled", true);
+	
+	button.onclick = function () {
+		var button = this;
+		var index = button.id.slice(4);
+		if (button.className == "off") {
+			buttonActivated(index);
 		} else {
-			window.clearTimeout(timerID);
-			isChirping = false;
-			listenButton.innerHTML = 'LISTEN';
+			buttonDeactivated(index);
 		}
 	}
-};
+	
+	buttons.appendChild(button);
+	if (i==2 || i==6 || i==8 || i==14 || i==19) {
+		var br = document.createElement("br");
+        buttons.appendChild(br);
+	}
+	
+}
+ */
+
+var course1Music = { 'isPlaying' : false };
+var course2Music = { 'isPlaying' : false };
+var course3Music = { 'isPlaying' : false };
+ 
+function course1ButtonPressed() {
+	if (buffersAreLoaded) {
+		if (!course1Music.isPlaying) {
+			//chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
+			course1Music = new IntermittentSound(audioBuffers[2], 0.145, 0.2, 5, 7, 0.5, 0.9, 0.1, 0.3, [[0,0]], false, course1MusicFinished);
+			course1Music.connect(gainNode);
+			course1Music.play();
+			//isChirping = true;
+			course1Button.innerHTML = 'STOP LISTENING';
+		} else {
+			//window.clearTimeout(timerID);
+			course1Music.stop();
+			//isChirping = false;
+			course1Button.innerHTML = 'LISTEN';
+		}
+	}
+}
+
+function course2ButtonPressed() {
+	if (buffersAreLoaded) {
+		if (!course2Music.isPlaying) {
+			//chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
+			course2Music = new IntermittentSound(audioBuffers[1], 0.145, 0.2, 5, 7, 0.5, 0.9, 0.1, 0.3, [[0,0]], false, course2MusicFinished);
+			course2Music.connect(gainNode);
+			course2Music.play();
+			//isChirping = true;
+			course2Button.innerHTML = 'STOP LISTENING';
+		} else {
+			//window.clearTimeout(timerID);
+			course2Music.stop();
+			//isChirping = false;
+			course2Button.innerHTML = 'LISTEN';
+		}
+	}
+}
+
+function course3ButtonPressed() {
+	if (buffersAreLoaded) {
+		if (!course3Music.isPlaying) {
+			//chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
+			course3Music = new IntermittentSound(audioBuffers[3], 0.145, 0.2, 5, 7, 0.5, 0.9, 0.1, 0.3, [[0,0]], false, course3MusicFinished);
+			course3Music.connect(gainNode);
+			course3Music.play();
+			//isChirping = true;
+			course3Button.innerHTML = 'STOP LISTENING';
+		} else {
+			//window.clearTimeout(timerID);
+			course3Music.stop();
+			//isChirping = false;
+			course3Button.innerHTML = 'LISTEN';
+		}
+	}
+}
+
+function course1MusicFinished() {
+	course1Button.innerHTML = 'LISTEN';
+}
+
+function course2MusicFinished() {
+	course2Button.innerHTML = 'LISTEN';
+}
+
+function course3MusicFinished() {
+	course3Button.innerHTML = 'LISTEN';
+}
 
 function chirp() {
 	var bufferToPlay;
