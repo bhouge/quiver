@@ -11,39 +11,13 @@ var listenerCount = 0;
 var supremeLeaderCount = 0;
 var mysteryUserCount = 0;
 
-var birdFileGroups = [0, 8, 22, 29];
+//var birdFileGroups = [0, 8, 22, 29];
 
 //var birdFileGroups = [0, 3, 8, 13, 18, 23, 28, 33, 40, 45, 50, 53, 58, 63, 68, 73, 76];
 
-var birdFileNames = ["cherries01.mp3",
-                   "cherries02.mp3",
-                   "cherries03.mp3",
-                   "cherries04.mp3",
-                   "cherries05.mp3",
-                   "cherries06.mp3",
-                   "cherries07.mp3",
-                   "cherries08.mp3",
-                   "oysters01.mp3",
-                   "oysters02.mp3",
-                   "oysters03.mp3",
-                   "oysters04.mp3",
-                   "oysters05.mp3",
-                   "oysters06.mp3",
-                   "oysters07.mp3",
-                   "oysters08.mp3",
-                   "oysters09.mp3",
-                   "oysters10.mp3",
-                   "oysters11.mp3",
-                   "oysters12.mp3",
-                   "oysters13.mp3",
-                   "oysters14.mp3",
-                   "paul01.mp3",
-                   "paul02.mp3",
-                   "paul03.mp3",
-                   "paul04.mp3",
-                   "paul05.mp3",
-                   "paul06.mp3",
-                   "paul07.mp3"]
+var fileNames = ["BowedVibesC#5d.mp3",
+                   "CL_Swell_B4.mp3",
+                   "Kora1_F3_a.mp3"];
 
 /*
 var birdFileNames = [
@@ -262,6 +236,21 @@ io.on('connection', function(socket){
 	    	//var fileToPush = __dirname + '/sounds/yooo.mp3';
     		//pushSoundToClient(fileToPush, 0, socket);
 	    	
+	    	//tell listener how many audio files to expect
+	    	socket.emit('sending audio', fileNames.length);
+	    	
+	    	//send the audio files
+	    	for (var i = 0; i < fileNames.length ; i++) {
+    			var nextFileName = fileNames[i];
+    			console.log(nextFileName);
+	    		var fileToPush = __dirname + directoryPrefix + nextFileName;
+	    		console.log(fileToPush);
+	    		pushSoundToClient(fileToPush, i, socket);
+	    	}
+	    	
+	    	
+	    	/*
+	    	//what we did for ploughmans
 	    	var birdFileIndex = Math.floor(Math.random() * (birdFileGroups.length - 1));
 	    	//console.log('birdFileIndex: ' + birdFileIndex);
 	    	var birdGroupStartIndex = birdFileGroups[birdFileIndex];
@@ -275,8 +264,13 @@ io.on('connection', function(socket){
 	    		//console.log(fileToPush);
 	    		pushSoundToClient(fileToPush, i, socket);
 	    	}
+	    	*/
 	    	
-	    	socket.emit('birds', numberOfBirdVariations);
+	    	
+	    	
+	    	//is this totally unused?
+	    	//what was this even for?
+	    	//I remember trying to implement a Fisher-Yates shuffle on the train to Barcelona...
 	    	
 	    	var numberOfPeopleToLoad;
 	    	if (peopleFileNames.length > 10) {

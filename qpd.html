@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>PLOUGHMAN'S LUNCH</title>
+<title>QUIVER, POP, AND DISSOLVE: THREE ESSAYS IN GASTROMORPHOLOGY</title>
 <style>
 	body { font: 24px Helvetica, Arial; }
 	button {
@@ -21,26 +21,30 @@
 </style>
 </head>
 <body>
-<h1>Ploughman’s Lunch: An Aural Reconsideration</h1>
-<h2>by Ben Houge and David Matchett with food from Borough Market, prepared by Chef Tim Kelsey</h2>
+<h1>Quiver, Pop, and Dissolve: Three Essays in Gastromorphology</h1>
+<h2>by Ben Houge and Jozef Youssef of Kitchen Theory</h2>
 
 <p>
-The sonic landscape of London's Borough Market is characterized by 
-the lively chatter of voices from around the world coming together
-in an environment that has stood as a community gathering place for centuries.
-
-This web application presents the cries of some of the market vendors recorded on July 6-7, 2017,
-capturing some of the spontaneous aural interplay that continues to beckon
-passersby to Borough Market.
+This project explores some of the different ways in which a meal can be considered as a time-based experience.
+There is the succession of courses, the entropy of each dish over time (flavors meld, temperatures equalize), 
+the rhythms of each bite, and the evolution and finish of flavor in the mouth.
+The term gastromorphology may be used to describe a meal as a function of time.
 </p>
 
 <div id="controlButtons">
+First Course:
 <button id="listen" class="off">LOADING...</button>
+<br><br>
+Second Course:
+<button id="course2" class="off">LOADING...</button>
+<br><br>
+Third Course:
+<button id="course3" class="off">LOADING...</button>
 </div>
 
 <h3>
-Press "Listen" to participate. 
-Turn your phone upside down to help the sound propagate and tap it periodically 
+As you receive each new course, press the corresponding button below to trigger the musical accompaniment.
+Turn your phone upside down to help the sound propagate and tap the screen periodically 
 to keep it from going to sleep during the performance.
 Please ensure that your volume is turned up and that your phone is not in silent mode.
 Chrome or Firefox are the recommended browsers on Android devices.
@@ -121,16 +125,20 @@ socket.on('get type', function(msg){
 	//console.log("client's secret message is " + msg);
 	socket.emit('i am', "listener");
 });
-socket.on('birds', function(msg){
-	//console.log("client's secret message is " + msg);
-	//alert('this many bird variations: ' + msg);
+socket.on('sending audio', function(msg){
+	console.log('this many audio files to receive: ' + msg);
+	//alert('this many audio files: ' + msg);
+	audioFilesToReceive = msg;
 });
 socket.on('audio', function(msg){
     console.log('audio received!');
     audioCtx.decodeAudioData(msg.buffer, function(buffer) {
     	audioBuffers[msg.index] = buffer;
-    	buffersAreLoaded = true;
-    	listenButton.innerHTML = 'LISTEN';
+    	audioFilesToReceive--;
+    	if (audioFilesToReceive <= 0) {
+    		buffersAreLoaded = true;
+        	listenButton.innerHTML = 'LISTEN';
+    	}
       }, 
       function(error) {
           console.error('decodeAudioData error', error);
@@ -151,6 +159,8 @@ var minChirps = 2;
 var maxChirps = 5;
 var chirpsRemaining = 0;
 var birdVariations = 0;
+
+var audioFilesToReceive = 0;
 
 
 function playSound(index) {
