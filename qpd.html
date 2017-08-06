@@ -1,0 +1,237 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PLOUGHMAN'S LUNCH</title>
+<style>
+	body { font: 24px Helvetica, Arial; }
+	button {
+		-webkit-appearance: none;
+		padding: 25px 5px;
+		text-align: center;
+		width: 90%;
+		font-size: 64px;
+		font-weight: bold;
+	}
+	.sliders {
+    margin: auto;
+    width: 50%;
+    padding: 10px;
+}
+</style>
+</head>
+<body>
+<h1>Ploughman’s Lunch: An Aural Reconsideration</h1>
+<h2>by Ben Houge and David Matchett with food from Borough Market, prepared by Chef Tim Kelsey</h2>
+
+<p>
+The sonic landscape of London's Borough Market is characterized by 
+the lively chatter of voices from around the world coming together
+in an environment that has stood as a community gathering place for centuries.
+
+This web application presents the cries of some of the market vendors recorded on July 6-7, 2017,
+capturing some of the spontaneous aural interplay that continues to beckon
+passersby to Borough Market.
+</p>
+
+<div id="controlButtons">
+<button id="listen" class="off">LOADING...</button>
+</div>
+
+<h3>
+Press "Listen" to participate. 
+Turn your phone upside down to help the sound propagate and tap it periodically 
+to keep it from going to sleep during the performance.
+Please ensure that your volume is turned up and that your phone is not in silent mode.
+Chrome or Firefox are the recommended browsers on Android devices.
+This web page will also work on a laptop (in which case inverting the device is not recommended).
+</h3>
+
+<script src="/socket.io/socket.io.js"></script>
+
+
+<script type="text/javascript">
+
+var socket = io();
+socket.on('control message', function(msg){
+	console.log("control message received: " + msg);
+	if (msg != "panic") {
+		var msgArray = msg.split('/');
+		var lastPart = msgArray[msgArray.length-1].split(' ');
+		if (msgArray.length >= 2) {
+			if (lastPart[0] == 'command' && lastPart.length >= 2) {
+				//kind of horrible idea for testing, simulating multiple devices to hear average timings...
+				for (var i = 0; i < 1; i++) {
+					//10 is the radix for decimal
+					birdButtonClicked(parseInt(lastPart[1], 10));
+				}
+			} else if (msgArray[msgArray.length-2] == 'slider' && lastPart.length >= 2) {
+				var sliderIntValue = parseInt(lastPart[1], 10);
+				var sliderFloatValue = parseFloat(lastPart[1], 10);
+				switch (parseInt(lastPart[0], 10)) {
+					case 0:
+						console.log('slider 0 value: ' + sliderFloatValue);
+						minVol = sliderFloatValue;
+						break;
+					case 1:
+						console.log('slider 1 value: ' + sliderFloatValue);
+						maxVol = sliderFloatValue;
+						break;
+					case 2:
+						console.log('slider 2 value: ' + sliderFloatValue);
+						minChirpPause = maxChirpLimit * sliderFloatValue;
+						console.log('setting min chirp pause to ' + minChirpPause + ' ms.');
+						break;
+					case 3:
+						console.log('slider 3 value: ' + sliderFloatValue);
+						maxChirpPause = maxChirpLimit * sliderFloatValue;
+						console.log('setting max chirp pause to ' + maxChirpPause + ' ms.');
+						break;
+					case 4:
+						console.log('slider 4 value: ' + sliderFloatValue);
+						minVolleyPause = maxVolleyLimit * sliderFloatValue;
+						console.log('setting min chirp pause to ' + minVolleyPause + ' ms.');
+						break;
+					case 5:
+						console.log('slider 5 value: ' + sliderFloatValue);
+						maxVolleyPause = maxVolleyLimit * sliderFloatValue;
+						console.log('setting max chirp pause to ' + maxVolleyPause + ' ms.');
+						break;
+					case 6:
+						console.log('slider 6 value: ' + sliderIntValue);
+						minChirps = sliderIntValue;
+						break;
+					case 7:
+						console.log('slider 7 value: ' + sliderIntValue);
+						maxChirps = sliderIntValue;
+						break;
+					default:
+						console.log('Not a valid slider.');
+						break;
+				}
+			} else {
+				console.log ('Perhaps you have a malformed command message on your hands.');
+			}
+		}
+	} else {
+		stopEverything();
+	}
+});
+socket.on('get type', function(msg){
+	//console.log("client's secret message is " + msg);
+	socket.emit('i am', "listener");
+});
+socket.on('birds', function(msg){
+	//console.log("client's secret message is " + msg);
+	//alert('this many bird variations: ' + msg);
+});
+socket.on('audio', function(msg){
+    console.log('audio received!');
+    audioCtx.decodeAudioData(msg.buffer, function(buffer) {
+    	audioBuffers[msg.index] = buffer;
+    	buffersAreLoaded = true;
+    	listenButton.innerHTML = 'LISTEN';
+      }, 
+      function(error) {
+          console.error('decodeAudioData error', error);
+      });
+});
+
+var timerID;
+var minVol = 0.7;
+var maxVol = 0.8;
+//min limits are 0, units are ms
+var maxChirpLimit = 10000;
+var maxVolleyLimit = 10000;
+var minChirpPause = 0.1 * maxChirpLimit;
+var maxChirpPause = 0.25 * maxChirpLimit;
+var minVolleyPause = 0.45 * maxVolleyLimit;
+var maxVolleyPause = 0.75 * maxVolleyLimit;
+var minChirps = 2;
+var maxChirps = 5;
+var chirpsRemaining = 0;
+var birdVariations = 0;
+
+
+function playSound(index) {
+	var source = audioCtx.createBufferSource();
+	source.buffer = audioBuffers[index];
+	gainNode.gain.value = Math.random() * (maxVol - minVol) + minVol;
+	//gainNode.gain.value = Math.random();
+	source.connect(gainNode);
+    source.start(audioCtx.currentTime);
+}
+
+
+var listenButtonEnabled = true;
+var isChirping = false;
+var listenButton = document.getElementById('listen');
+listenButton.onclick = function() {
+	if (buffersAreLoaded) {
+		if (!isChirping) {
+			chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
+			chirp();
+			isChirping = true;
+			listenButton.innerHTML = 'STOP LISTENING';
+		} else {
+			window.clearTimeout(timerID);
+			isChirping = false;
+			listenButton.innerHTML = 'LISTEN';
+		}
+	}
+};
+
+function chirp() {
+	var bufferToPlay;
+	if (listenButtonEnabled && audioBuffers.length > 0) {
+		//hopefully this little check will catch the case when all buffers might not yet have been received,
+		//since they arrive asynchronously
+		//and hopefully we are making sure that the button will not be enabled until at least one buffer has been received.
+		do {
+			bufferToPlay = Math.floor(Math.random() * audioBuffers.length);
+		} while (!audioBuffers[bufferToPlay]);
+	}
+	playSound(bufferToPlay);
+	chirpsRemaining--;
+	console.log('chirpsRemaining: ' + chirpsRemaining);
+	var pauseDur;
+	if (chirpsRemaining > 0) {
+		pauseDur = Math.random() * (maxChirpPause - minChirpPause) + minChirpPause;
+	} else {
+		pauseDur = Math.random() * (maxVolleyPause - minVolleyPause) + minVolleyPause;
+		console.log('chirpsRemaining is 0 or less, so picking new volley time of ' + pauseDur);
+		var randomNumber = Math.random();
+		//console.log('randomNumber: ' + randomNumber);
+		//console.log('minChirps: ' + minChirps + '; maxChirps: ' + maxChirps);
+		//console.log('maxChirps - minChirps: ' + (maxChirps - minChirps));
+		//console.log('1 + maxChirps - minChirps: ' + (1 + maxChirps - minChirps));
+		//console.log('Math.random() * (1 + maxChirps - minChirps): ' + (randomNumber * (1 + maxChirps - minChirps)));
+		//console.log('Math.random() * (1 + maxChirps - minChirps) + minChirps: ' + (randomNumber * (1 + maxChirps - minChirps) + minChirps));
+		//console.log('Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps: ' + (Math.floor(randomNumber * (1 + maxChirps - minChirps)) + minChirps));
+		chirpsRemaining = Math.floor(randomNumber * (1 + maxChirps - minChirps)) + minChirps;
+		console.log('new chirpsRemaining: ' + chirpsRemaining);
+	}
+	//add length of sample
+	pauseDur += audioBuffers[bufferToPlay].duration * 1000.0;
+	timerID = window.setTimeout(chirp, pauseDur);
+}
+
+function stopEverything() {
+	//not sure we need to implement this for Oxford...
+}
+
+//setting up our audio context and creating our master gain
+var AudioContext = window.AudioContext || window.webkitAudioContext;
+var audioCtx = new AudioContext();
+
+var gainNode = audioCtx.createGain();
+gainNode.connect(audioCtx.destination);
+gainNode.gain.value = 1.0;
+
+var audioBuffers = [];
+var buffersAreLoaded = false;
+
+</script>
+
+</body>
+</html>

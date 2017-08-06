@@ -1,0 +1,9 @@
+{
+  "name": "QuiverPopDissolve",
+  "version": "0.0.1",
+  "description": "Three Essays in Gastromorphology, presented at the 3rd Web Audio Conference 2017",
+  "dependencies": {
+    "express": "^4.15.2",
+    "socket.io": "^2.0.3"
+  }
+}
