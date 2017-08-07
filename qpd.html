@@ -53,6 +53,7 @@ This web page will also work on a laptop (in which case inverting the device is 
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="scripts/IntermittentSound.js"></script>
+<script src="scripts/Evolve.js"></script>
 
 <script type="text/javascript">
 
@@ -256,7 +257,7 @@ function course1ButtonPressed() {
 	if (buffersAreLoaded) {
 		if (!course1Music.isPlaying) {
 			//chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
-			course1Music = new IntermittentSound(audioBuffers[2], 0.145, 0.2, 5, 7, 0.5, 0.9, 0.1, 0.3, [[0,0]], false, course1MusicFinished);
+			course1Music = new IntermittentSound(audioBuffers[0], 0.145, 0.5, 10, 15, 0.8, 0.9, 0.1, 2.0, [[0,0], [0,2], [0,-1]], false, course1MusicFinished);
 			course1Music.connect(gainNode);
 			course1Music.play();
 			//isChirping = true;
@@ -274,9 +275,9 @@ function course2ButtonPressed() {
 	if (buffersAreLoaded) {
 		if (!course2Music.isPlaying) {
 			//chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
-			course2Music = new IntermittentSound(audioBuffers[1], 0.145, 0.2, 5, 7, 0.5, 0.9, 0.1, 0.3, [[0,0]], false, course2MusicFinished);
+			course2Music = new Evolve(audioBuffers[3], 0.145, 0.5, 10, 15, 0.5, 0.9, 0.1, 2.0, [[0,0], [0,1]], false, course2MusicFinished);
 			course2Music.connect(gainNode);
-			course2Music.play();
+			course2Music.playNote(2.2, 1., 1., 0.);
 			//isChirping = true;
 			course2Button.innerHTML = 'STOP LISTENING';
 		} else {
@@ -292,7 +293,7 @@ function course3ButtonPressed() {
 	if (buffersAreLoaded) {
 		if (!course3Music.isPlaying) {
 			//chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
-			course3Music = new IntermittentSound(audioBuffers[3], 0.145, 0.2, 5, 7, 0.5, 0.9, 0.1, 0.3, [[0,0]], false, course3MusicFinished);
+			course3Music = new IntermittentSound(audioBuffers[3], 0.145, 0.5, 10, 15, 0.5, 0.9, 0.1, 2.0, [[0,0]], false, course3MusicFinished);
 			course3Music.connect(gainNode);
 			course3Music.play();
 			//isChirping = true;
