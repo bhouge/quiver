@@ -1,37 +1,21 @@
 /**
- * IntermittentSound
+ * Evolve
  * by Ben Houge
- * IntermittentSound encapsulates the functionality of a sound that repeats intermittently, appropriately enough.
- * It's a technique I've used in many of my pieces (dating back to graphic score 'A Reading from _____' in 2003): 
- * Specify a buffer of PCM data, min/max repeats, and min/max pause between repeats.
- * Note that we're talking repeats, not plays; when you press play, it will always play at least once.
+ * Some kind of behavior that plays some notes...
+ * It will be neato.
  */
 
 // creating an intermittentSound object with an object constructor
-function Evolve(buffer, minPause, maxPause, minReps, maxReps, minVol, maxVol, minDur, maxDur, pitchArray, startWithPause, completionCallback) {
+function Evolve(instrumentArray, minPause, maxPause, minReps, maxReps, completionCallback) {
 	//alert(this);
-	this.buffer = buffer;
+	this.piano = instrumentArray[0];
+	this.nyatiti = instrumentArray[1];
 	this.minPause = minPause;
 	this.maxPause = maxPause;
 	this.minReps = minReps;
 	this.maxReps = maxReps;
-	this.minVol = minVol;
-	this.maxVol = maxVol;
-	this.minDur = minDur;
-	this.maxDur = maxDur;
-	this.outputNode;
-	this.isPlaying = false;
-	this.pitchArray = pitchArray;
-	this.startWithPause = startWithPause;
 	this.completionCallback = completionCallback;
 	
-	this.dur = Math.random() * (this.maxDur - this.minDur) + this.minDur;
-	if (this.dur > this.buffer.duration) {
-		this.dur = this.buffer.duration;
-		this.startTime = 0;
-	} else {
-		this.startTime = Math.random() * (this.buffer.duration - this.dur);
-	}
 	
 	// private variables
 	
@@ -41,7 +25,6 @@ function Evolve(buffer, minPause, maxPause, minReps, maxReps, minVol, maxVol, mi
 	var that = this;
 	
 	var timerID;
-	var piano;
 	
 	function playBuffer(bufferIndex, volume, pitch) {
 		//somewhere in here we should probably error check to make sure an outputNode with an audioContext is connected
@@ -76,18 +59,20 @@ function Evolve(buffer, minPause, maxPause, minReps, maxReps, minVol, maxVol, mi
 	
 	// making this a private member function
 	function tickDownIntermittentSound() {
-		var volume = (that.maxVol - that.minVol) * Math.random() + that.minVol;
-		var pitchIndex = Math.floor(Math.random() * that.pitchArray.length); 
-		var pitch = pitchClassToMultiplier(that.pitchArray[pitchIndex][0], that.pitchArray[pitchIndex][1]);
-		//playBuffer(that.buffer, volume, pitch);
-		
 		var possibleNotes = [77, 75, 79, 77.5, 76.5];
 		var note2Play = possibleNotes[Math.floor(5 * Math.random())];
 		var octave = (Math.floor(4 * Math.random()) - 1) * 12;
-		var offset = Math.random() * 0.125;
-		
+		var offset1 = Math.random() * 0.125;
+		var offset2 = Math.random() * 0.125;
+		var pianoVol = Math.random();
+		var nyatitiVol = 1. - pianoVol;
 		//var offset = 0;
-		piano.playNote(note2Play + octave, 0.5, 1., offset);
+		
+		var piano = this.piano;
+		var nyatiti = this.nyatiti;
+		piano.playNote(note2Play, pianoVol, 1., offset1);
+		//54.093589 is the base MIDI note for 186Hz baseFreq of kora
+		nyatiti.playNote(note2Play, nyatitiVol, 1., offset2);
 		//var bufferDur = that.buffer.duration;
 		// not anymore, now I'm specifying this, right?
 		var bufferDur = that.dur;
@@ -95,7 +80,8 @@ function Evolve(buffer, minPause, maxPause, minReps, maxReps, minVol, maxVol, mi
 			var pauseDur = (that.maxPause - that.minPause) * Math.random() + that.minPause;
 			timerID = window.setTimeout(tickDownIntermittentSound, (pauseDur) * 1000.);
 		} else {
-			timerID = window.setTimeout(finishedPlaying, (bufferDur/pitch) * 1000.);
+			//fix this later
+			//timerID = window.setTimeout(finishedPlaying, (bufferDur/pitch) * 1000.);
 		}
 		that.numberOfReps--;
 	}
@@ -194,8 +180,10 @@ function Evolve(buffer, minPause, maxPause, minReps, maxReps, minVol, maxVol, mi
 			alert("It seems you have not specified a valid node.");
 		}
 		// baseFreq 698.456463 is MIDI note 77 (a high F)
-		piano = new MIDIInstrument(this.buffer, 698.456463, 0.01, 0.5, 0.7, 0.1);
-		piano.connect(that.outputNode);
+		//piano = new MIDIInstrument(this.buffer, 698.456463, 0.01, 0.5, 0.7, 0.1);
+		//piano.connect(that.outputNode);
+		//nyatiti = new MIDIInstrument(this.buffer, 186., 0.01, 0.5, 0.7, 0.1);
+		//nyatiti.connect(that.outputNode);
 	}
 	
 	this.estimateDuration = function() {
