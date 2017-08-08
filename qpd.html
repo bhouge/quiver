@@ -52,6 +52,7 @@ This web page will also work on a laptop (in which case inverting the device is 
 </h3>
 
 <script src="/socket.io/socket.io.js"></script>
+<script src="scripts/MIDIInstrument.js"></script>
 <script src="scripts/IntermittentSound.js"></script>
 <script src="scripts/Evolve.js"></script>
 
@@ -275,9 +276,10 @@ function course2ButtonPressed() {
 	if (buffersAreLoaded) {
 		if (!course2Music.isPlaying) {
 			//chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
-			course2Music = new Evolve(audioBuffers[3], 0.145, 0.5, 10, 15, 0.5, 0.9, 0.1, 2.0, [[0,0], [0,1]], false, course2MusicFinished);
+			course2Music = new Evolve(audioBuffers[3], 0.1, 0.1, 1, 20, 0.5, 0.9, 0.1, 2.0, [[0,0], [0,1]], false, course2MusicFinished);
 			course2Music.connect(gainNode);
-			course2Music.playNote(2.2, 1., 1., 0.);
+			//course2Music.playNote(2.2, 1., 1., 0.5);
+			course2Music.play();
 			//isChirping = true;
 			course2Button.innerHTML = 'STOP LISTENING';
 		} else {

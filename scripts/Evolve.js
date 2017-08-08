@@ -34,11 +34,14 @@ function Evolve(buffer, minPause, maxPause, minReps, maxReps, minVol, maxVol, mi
 	}
 	
 	// private variables
-	var timerID;
+	
 	// Douglas Crockford told me to do this: http://www.crockford.com/javascript/private.html
 	// It's a convention that allows private member functions to access the object
 	// due to an error in the ECMAScript Language Specification
 	var that = this;
+	
+	var timerID;
+	var piano;
 	
 	function playBuffer(bufferIndex, volume, pitch) {
 		//somewhere in here we should probably error check to make sure an outputNode with an audioContext is connected
@@ -69,18 +72,28 @@ function Evolve(buffer, minPause, maxPause, minReps, maxReps, minVol, maxVol, mi
 		}		
 	}
 	
+	
+	
 	// making this a private member function
 	function tickDownIntermittentSound() {
 		var volume = (that.maxVol - that.minVol) * Math.random() + that.minVol;
 		var pitchIndex = Math.floor(Math.random() * that.pitchArray.length); 
 		var pitch = pitchClassToMultiplier(that.pitchArray[pitchIndex][0], that.pitchArray[pitchIndex][1]);
-		playBuffer(that.buffer, volume, pitch);
+		//playBuffer(that.buffer, volume, pitch);
+		
+		var possibleNotes = [77, 75, 79, 77.5, 76.5];
+		var note2Play = possibleNotes[Math.floor(5 * Math.random())];
+		var octave = (Math.floor(4 * Math.random()) - 1) * 12;
+		var offset = Math.random() * 0.125;
+		
+		//var offset = 0;
+		piano.playNote(note2Play + octave, 0.5, 1., offset);
 		//var bufferDur = that.buffer.duration;
 		// not anymore, now I'm specifying this, right?
 		var bufferDur = that.dur;
 		if (that.numberOfReps > 0 && that.isPlaying) {
 			var pauseDur = (that.maxPause - that.minPause) * Math.random() + that.minPause;
-			timerID = window.setTimeout(tickDownIntermittentSound, (pauseDur + bufferDur/pitch) * 1000.);
+			timerID = window.setTimeout(tickDownIntermittentSound, (pauseDur) * 1000.);
 		} else {
 			timerID = window.setTimeout(finishedPlaying, (bufferDur/pitch) * 1000.);
 		}
@@ -112,6 +125,13 @@ function Evolve(buffer, minPause, maxPause, minReps, maxReps, minVol, maxVol, mi
 		}
 	}
 	
+	var envelope = [[0,0]];
+	//attack time to 1
+	//decay time to sustain level
+	//sustain level
+	//release time
+	
+	
 	this.playNote = function(pitch, volume, duration, startTime) {
 		//somewhere in here we should probably error check to make sure an outputNode with an audioContext is connected
 		//var newNow = that.outputNode.context.currentTime + 0.1;
@@ -125,19 +145,30 @@ function Evolve(buffer, minPause, maxPause, minReps, maxReps, minVol, maxVol, mi
 		//audioBufferGain.gain.setValueAtTime(0., that.outputNode.context.currentTime);
 		audioBufferSource.connect(audioBufferGain);
 		audioBufferGain.connect(that.outputNode);
+		//seems goofy, but by scheduling everything slightly into the future (voluntarily adding latency),
+		//I was able to get rid of an ugly intermittent click (which randomly occurred even with no randomnessin parameters)
+		//Keep an eye on this value as you test on other devices...
+		//you could use this as a way to have different timing offsets for different devices...
+		//console.log("User-agent header sent: " + navigator.userAgent;);
+		//maybe this could help? https://source.android.com/devices/audio/latency_measurements
+		var timeToStart = that.outputNode.context.currentTime + 0.05;
 		try {
 			//audioBufferSource.start(newNow, that.startTime, that.dur);
 			
 			//alert(that.outputNode.context.currentTime);
 			//audioBufferGain.gain.linearRampToValueAtTime(volume, newNow + 0.05);
 			
-			audioBufferGain.gain.linearRampToValueAtTime(0.0, that.outputNode.context.currentTime);
-			audioBufferGain.gain.linearRampToValueAtTime(volume, that.outputNode.context.currentTime + 0.05);
-			audioBufferGain.gain.linearRampToValueAtTime(volume, that.outputNode.context.currentTime + (duration - 0.05));
-			audioBufferGain.gain.linearRampToValueAtTime(0.0, that.outputNode.context.currentTime + duration);
+			audioBufferGain.gain.linearRampToValueAtTime(0.0, timeToStart);
+			audioBufferGain.gain.linearRampToValueAtTime(volume, timeToStart + 0.05);
+			//audioBufferGain.gain.linearRampToValueAtTime(volume, that.outputNode.context.currentTime + (duration - 0.05));
+			audioBufferGain.gain.linearRampToValueAtTime(0.0, timeToStart + duration);
 			//unless there's something I'm missing here, duration gets scaled with pitch
 			//so if you want duration to not scale with pitch, you should multiply it by pitch, which I was not doing before.
-			audioBufferSource.start(that.outputNode.context.currentTime, startTime, duration * pitch);
+			//audioBufferSource.start(that.outputNode.context.currentTime, startTime, duration * pitch);
+			audioBufferSource.start(timeToStart, startTime);
+			//console.log('duration * pitch is ' + (duration * pitch));
+			//console.log('startTime is ' + startTime);
+			//console.log('duration is ' + duration);
 		} catch(e) {
 			alert(e);
 		}
@@ -162,6 +193,9 @@ function Evolve(buffer, minPause, maxPause, minReps, maxReps, minVol, maxVol, mi
 		} catch(e) {
 			alert("It seems you have not specified a valid node.");
 		}
+		// baseFreq 698.456463 is MIDI note 77 (a high F)
+		piano = new MIDIInstrument(this.buffer, 698.456463, 0.01, 0.5, 0.7, 0.1);
+		piano.connect(that.outputNode);
 	}
 	
 	this.estimateDuration = function() {
