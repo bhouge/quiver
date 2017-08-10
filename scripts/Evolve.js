@@ -70,9 +70,9 @@ function Evolve(instrumentArray, minPause, maxPause, minReps, maxReps, completio
 		
 		var piano = this.piano;
 		var nyatiti = this.nyatiti;
-		piano.playNote(note2Play, pianoVol, 1., offset1);
+		piano.playNote(note2Play+ octave, pianoVol, 1., offset1);
 		//54.093589 is the base MIDI note for 186Hz baseFreq of kora
-		nyatiti.playNote(note2Play, nyatitiVol, 1., offset2);
+		nyatiti.playNote(note2Play + octave, nyatitiVol, 1., offset2);
 		//var bufferDur = that.buffer.duration;
 		// not anymore, now I'm specifying this, right?
 		var bufferDur = that.dur;

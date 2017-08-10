@@ -367,10 +367,10 @@ function stopEverything() {
 
 function initializeInstruments() {
 	//baseFreq 698.456463 Hz is MIDI note 77 (a high F)
-	piano = new MIDIInstrument(audioBuffers[3], 698.456463, 0.01, 0.5, 0.7, 0.1);
+	piano = new MIDIInstrument(audioBuffers[3], 698.456463, 0.01, 0.1);
 	piano.connect(gainNode);
 	//baseFreq 186Hz is MIDI note 54.093589 (a little sharp of F# below middle C)
-	nyatiti = new MIDIInstrument(audioBuffers[2], 186., 0.01, 0.5, 0.7, 0.1);
+	nyatiti = new MIDIInstrument(audioBuffers[2], 186., 0.01, 0.5);
 	nyatiti.connect(gainNode);
 }
 
