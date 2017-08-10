@@ -25,32 +25,20 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 	// It's a convention that allows private member functions to access the object
 	// due to an error in the ECMAScript Language Specification
 	var that = this;
-	
 	var timerID;
-	// this is total duration (specified duration + release)
-	var dur;
-	
-	//Should fire when all notes are done?
-	function finishedPlaying() {
-		//console.log("this is how we know an intermittent sound is done, right?");
-		if (that.completionCallback) {
-			that.completionCallback();
-		}
-	}
-	
-	//this works differently from IntermittentSound, using absolute MIDI notes, not an offset
-	//actually don't need this, do I? write a new function...
-	function pitchClassToMultiplier(octave, interval) {
-		var multiplier = Math.pow(2., (12. * octave + interval) / 12.);
-		return multiplier;
-	}	
 	
 	function midiNoteToMultiplier(midiNote) {
 		var multiplier = Math.pow(2., (midiNote - 69.) / 12.) * (440. / that.baseFreq);
 		return multiplier;
 	}
 	
-	698.456463
+	//Should fire when all notes are done?
+	function finishedPlaying() {
+		//console.log("Done!");
+		if (that.completionCallback) {
+			that.completionCallback();
+		}
+	}
 	
 	this.playNote = function(midiNote, volume, duration, startTime) {
 		//somewhere in here we should probably error check to make sure an outputNode with an audioContext is connected
@@ -66,15 +54,16 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 		//audioBufferGain.gain.setValueAtTime(0., that.outputNode.context.currentTime);
 		audioBufferSource.connect(audioBufferGain);
 		audioBufferGain.connect(that.outputNode);
+		
 		//seems goofy, but by scheduling everything slightly into the future (voluntarily adding latency),
 		//I was able to get rid of an ugly intermittent click (which randomly occurred even with no randomnessin parameters)
 		//Keep an eye on this value as you test on other devices...
 		//you could use this as a way to have different timing offsets for different devices...
-		//console.log("User-agent header sent: " + navigator.userAgent;);
+		//console.log("User-agent header sent: " + navigator.userAgent);
 		//maybe this could help? https://source.android.com/devices/audio/latency_measurements
 		var timeToStart = that.outputNode.context.currentTime + 0.05;
 		
-		//if 
+		//if duration is less than sum of fade times, scale fade times down proportionately
 		var fadeIn;
 		var fadeOut;
 		if ((that.fadeIn + that.fadeOut) > duration) {
@@ -97,7 +86,7 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 		} catch(e) {
 			alert(e);
 		}
-		//timerID = window.setTimeout(finishedPlaying, (duration/pitch) * 1000.);
+		timerID = window.setTimeout(finishedPlaying, duration * 1000.);
 	}
 	
 	//think about this...do you need a stop function?
