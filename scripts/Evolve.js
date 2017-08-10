@@ -65,7 +65,7 @@ function Evolve(instrumentArray, minPause, maxPause, minReps, maxReps, completio
 		var possibleNotes = [77, 75, 79, 78, 76];
 		var note2Play = possibleNotes[Math.floor(5 * Math.random())];
 		var octave = (Math.floor(4 * Math.random()) - 1) * 12;
-		note2Play = currentNote;
+		//note2Play = currentNote;
 		var offset1 = Math.random() * 0.125;
 		var offset2 = Math.random() * 0.125;
 		var pianoVol = Math.random();
@@ -74,9 +74,9 @@ function Evolve(instrumentArray, minPause, maxPause, minReps, maxReps, completio
 		
 		var piano = this.piano;
 		var nyatiti = this.nyatiti;
-		piano.playNote(note2Play, pianoVol, 1., offset1);
+		piano.playNote(note2Play + octave, pianoVol, 1., offset1);
 		//54.093589 is the base MIDI note for 186Hz baseFreq of kora
-		nyatiti.playNote(note2Play, nyatitiVol, 1., offset2);
+		nyatiti.playNote(note2Play + octave, nyatitiVol, 1., offset2);
 		//var bufferDur = that.buffer.duration;
 		// not anymore, now I'm specifying this, right?
 		var bufferDur = that.dur;
