@@ -19,6 +19,8 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 	this.fadeIn = fadeIn;
 	this.fadeOut = fadeOut;
 	this.completionCallback = completionCallback;
+	this.basePitchForRetuning = 0;
+	this.retuningMap = [];
 	
 	// private variables
 	// Douglas Crockford told me to do this: http://www.crockford.com/javascript/private.html
@@ -28,9 +30,61 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 	var timerID;
 	
 	function midiNoteToMultiplier(midiNote) {
-		var multiplier = Math.pow(2., (midiNote - 69.) / 12.) * (440. / that.baseFreq);
+		var multiplier;
+		//var scaleDegree = midiNote % 12;
+		var scaleDegree = ((midiNote + 12) - that.basePitchForRetuning) % 12;
+		console.log('MIDI note ' + midiNote + ' is scale degree ' + scaleDegree);
+		var octave = Math.floor((midiNote - that.basePitchForRetuning) / 12);
+		console.log('octave: ' + octave);
+		
+		var ratioToBaseNote;
+		if (that.retuningMap[scaleDegree]) {
+			ratioToBaseNote = that.retuningMap[scaleDegree];
+		} else {
+			ratioToBaseNote = Math.pow(2., scaleDegree / 12.);
+		}
+		console.log('ratio of desired note to base note: ' + ratioToBaseNote);
+		
+		var scaleDegreeOfReferenceNote = (69 - that.basePitchForRetuning) % 12;
+		var octaveOfReferenceNote = Math.floor((69. - that.basePitchForRetuning) / 12.);
+		
+		var ratioOfReferenceToBaseNote;
+		if (that.retuningMap[scaleDegreeOfReferenceNote]) {
+			ratioOfReferenceToBaseNote = that.retuningMap[scaleDegreeOfReferenceNote];
+		} else {
+			ratioOfReferenceToBaseNote = Math.pow(2., scaleDegreeOfReferenceNote / 12.);
+		}
+		
+		console.log('ratio of reference note to base note: ' + ratioOfReferenceToBaseNote);
+		
+		multiplier = ratioToBaseNote * ((440. / that.baseFreq) / ratioOfReferenceToBaseNote) * Math.pow(2., octave - octaveOfReferenceNote);
+		
+		//multiplier = Math.pow(2., (midiNote - 69.) / 12.) * (440. / that.baseFreq);
 		return multiplier;
 	}
+	
+	/*
+	function midiNoteToMultiplier(midiNote) {
+		var multiplier;
+		if (that.retuningMap.length > 0) {
+			console.log('There is a retuning map.');
+			var scaleDegree = (midiNote + that.basePitchForRetuning) % 12;
+			console.log('MIDI note ' + midiNote + ' is scale degree ' + scaleDegree + '.');
+			if (that.retuningMap[scaleDegree]) {
+				var scaleDegreeMultiplier = that.retuningMap[scaleDegree]; 
+				console.log('The multiplier is ' + scaleDegreeMultiplier + '.');
+				//this needs to get multiplied by
+				var octave = Math.floor(midiNote + that.basePitchForRetuning / 12.);
+				//multiplier = Math.pow(2., (midiNote - 69.) / 12.) * (440. / that.baseFreq);
+			} else {
+				multiplier = Math.pow(2., (midiNote - 69.) / 12.) * (440. / that.baseFreq);
+			}
+		} else {
+			multiplier = Math.pow(2., (midiNote - 69.) / 12.) * (440. / that.baseFreq);
+		}
+		return multiplier;
+	}
+	*/
 	
 	//Should fire when all notes are done?
 	function finishedPlaying() {

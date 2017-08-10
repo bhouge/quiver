@@ -26,6 +26,9 @@ function Evolve(instrumentArray, minPause, maxPause, minReps, maxReps, completio
 	
 	var timerID;
 	
+	//just for testing
+	var currentNote = 60;
+	
 	function playBuffer(bufferIndex, volume, pitch) {
 		//somewhere in here we should probably error check to make sure an outputNode with an audioContext is connected
 		//var newNow = that.outputNode.context.currentTime + 0.1;
@@ -59,9 +62,10 @@ function Evolve(instrumentArray, minPause, maxPause, minReps, maxReps, completio
 	
 	// making this a private member function
 	function tickDownIntermittentSound() {
-		var possibleNotes = [77, 75, 79, 77.5, 76.5];
+		var possibleNotes = [77, 75, 79, 78, 76];
 		var note2Play = possibleNotes[Math.floor(5 * Math.random())];
 		var octave = (Math.floor(4 * Math.random()) - 1) * 12;
+		note2Play = currentNote;
 		var offset1 = Math.random() * 0.125;
 		var offset2 = Math.random() * 0.125;
 		var pianoVol = Math.random();
@@ -70,9 +74,9 @@ function Evolve(instrumentArray, minPause, maxPause, minReps, maxReps, completio
 		
 		var piano = this.piano;
 		var nyatiti = this.nyatiti;
-		piano.playNote(note2Play+ octave, pianoVol, 1., offset1);
+		piano.playNote(note2Play, pianoVol, 1., offset1);
 		//54.093589 is the base MIDI note for 186Hz baseFreq of kora
-		nyatiti.playNote(note2Play + octave, nyatitiVol, 1., offset2);
+		nyatiti.playNote(note2Play, nyatitiVol, 1., offset2);
 		//var bufferDur = that.buffer.duration;
 		// not anymore, now I'm specifying this, right?
 		var bufferDur = that.dur;
@@ -84,6 +88,12 @@ function Evolve(instrumentArray, minPause, maxPause, minReps, maxReps, completio
 			//timerID = window.setTimeout(finishedPlaying, (bufferDur/pitch) * 1000.);
 		}
 		that.numberOfReps--;
+		//only for testing...
+		currentNote++;
+		if (currentNote % 12 == 1 || currentNote % 12 == 3 || currentNote % 12 == 6 || currentNote % 12 == 8 || currentNote % 12 == 10) {
+			currentNote++;
+		}
+		
 	}
 	
 	function finishedPlaying() {

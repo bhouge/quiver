@@ -281,7 +281,7 @@ function course2ButtonPressed() {
 	if (buffersAreLoaded) {
 		if (!course2Music.isPlaying) {
 			//chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
-			course2Music = new Evolve([piano, nyatiti], 0.1, 0.1, 1, 20, course2MusicFinished);
+			course2Music = new Evolve([piano, nyatiti], 0.1, 0.1, 28, 28, course2MusicFinished);
 			course2Music.connect(gainNode);
 			//course2Music.playNote(2.2, 1., 1., 0.5);
 			course2Music.play();
@@ -368,9 +368,13 @@ function stopEverything() {
 function initializeInstruments() {
 	//baseFreq 698.456463 Hz is MIDI note 77 (a high F)
 	piano = new MIDIInstrument(audioBuffers[3], 698.456463, 0.01, 0.1);
+	piano.retuningMap = [1/1, 16/15, 9/8, 7/6, 5/4, 4/3, 11/8, 3/2, 8/5, 12/7, 16/9, 15/8];
+	piano.basePitchForRetuning = 0;
 	piano.connect(gainNode);
 	//baseFreq 186Hz is MIDI note 54.093589 (a little sharp of F# below middle C)
 	nyatiti = new MIDIInstrument(audioBuffers[2], 186., 0.01, 0.5);
+	nyatiti.retuningMap = [1/1, 16/15, 9/8, 7/6, 5/4, 4/3, 11/8, 3/2, 8/5, 12/7, 16/9, 15/8];
+	nyatiti.basePitchForRetuning = 0;
 	nyatiti.connect(gainNode);
 }
 
