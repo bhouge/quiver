@@ -54,6 +54,7 @@ This web page will also work on a laptop (in which case inverting the device is 
 <script src="/socket.io/socket.io.js"></script>
 <script src="scripts/MIDIInstrument.js"></script>
 <script src="scripts/IntermittentSound.js"></script>
+<script src="scripts/Plunk.js"></script>
 <script src="scripts/Evolve.js"></script>
 
 <script type="text/javascript">
@@ -262,7 +263,7 @@ function course1ButtonPressed() {
 	if (buffersAreLoaded) {
 		if (!course1Music.isPlaying) {
 			//chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
-			course1Music = new IntermittentSound(audioBuffers[0], 0.145, 0.5, 10, 15, 0.8, 0.9, 0.1, 2.0, [[0,0], [0,2], [0,-1]], false, course1MusicFinished);
+			course1Music = new Plunk(piano, nyatiti, 120., 4, 0.1, 0.1, 28, 28, course1MusicFinished);
 			course1Music.connect(gainNode);
 			course1Music.play();
 			//isChirping = true;
@@ -375,12 +376,12 @@ function initializeInstruments() {
 	//baseFreq 698.456463 Hz is MIDI note 77 (a high F)
 	piano = new MIDIInstrument(audioBuffers[3], 698.456463, 0.01, 0.1);
 	piano.retuningMap = [1/1, 33/32, 9/8, 7/6, 5/4, 4/3, 11/8, 3/2, 8/5, 12/7, 16/9, 64/33];
-	piano.basePitchForRetuning = 5;
+	piano.basePitchForRetuning = 0;
 	piano.connect(gainNode);
 	//baseFreq 186Hz is MIDI note 54.093589 (a little sharp of F# below middle C)
 	nyatiti = new MIDIInstrument(audioBuffers[2], 186., 0.01, 0.5);
 	nyatiti.retuningMap = piano.retuningMap;
-	nyatiti.basePitchForRetuning = 5;
+	nyatiti.basePitchForRetuning = 0;
 	nyatiti.connect(gainNode);
 }
 
