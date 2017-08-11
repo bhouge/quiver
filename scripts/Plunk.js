@@ -21,7 +21,7 @@ function Plunk(instrument1, instrument2, bpm, ticksPerBeat, minPause, maxPause, 
 	//I don't think I need this...
 	this.completionCallback = completionCallback;
 	
-	var beatsToPause = 4;
+	var isPausing = false;
 	
 	// private variables
 	
@@ -38,58 +38,28 @@ function Plunk(instrument1, instrument2, bpm, ticksPerBeat, minPause, maxPause, 
 	//just for testing
 	var currentNote = 60;
 	//let's define notes as pitch (MIDI), volume (0-1), duration (in beats)
-	var phrase2Play = [[60, 1., 1], [62, 0.8, 1], [64, 0.5, 2], [60, 0.35, 1], [67, 1., 2], [59, 0.65, 1]];
+	var phrases = [
+	               [[60, 1., 1], [62, 0.8, 1], [64, 0.5, 2], [60, 0.35, 1], [67, 1., 2], [59, 0.65, 1]],
+	               [[72, 1., 1], [71, 0.8, 1], [69, 0.5, 2], [71, 0.35, 1], [67, 1., 2], [62, 0.65, 1]],
+	               [[65, 0.8, 2], [64, 0.5, 1], [62, 0.9, 1], [61, 0.25, 1], [60, 1., 1], [59, 1., 1], [67, 0.65, 1]]
+	               ];
+	var phrase1 = [[60, 1., 1], [62, 0.8, 1], [64, 0.5, 2], [60, 0.35, 1], [67, 1., 2], [59, 0.65, 1]];
+	var phrase2 = [[72, 1., 1], [71, 0.8, 1], [69, 0.5, 2], [71, 0.35, 1], [67, 1., 2], [62, 0.65, 1]];
+	var phrase3 = [[69, 1., 1], [67, 0.8, 1], [62, 0.5, 2], [65, 0.35, 1], [64, 1., 2], [61, 0.65, 1]];
+	
+	var phrase2Play;
+	
 	var noteIndex = 0;
 	//this is in beats
 	var durationOfSecondNote = 3;
-	var counter = 0;
+
 	var lookAheadTime = 500;
 	
 	var beats = [];
 	
-	var countdownToEndOfCurrentNote = 0;
-	
-	// making this a private member function
-	function tickDownIntermittentSound() {
-		if (counter <= 0) {
-			var note2Play = phrase2Play[noteIndex][0];
-			//var octave = (Math.floor(4 * Math.random()) - 1) * 12;
-			var octave = 0;
-			//note2Play = currentNote;
-			var offset1 = Math.random() * 0.125;
-			var offset2 = Math.random() * 0.125;
-			
-			var vol = phrase2Play[noteIndex][1];
-			//var pianoVol = Math.random();
-			//var nyatitiVol = 1. - pianoVol;
-			//var offset = 0;
-			
-			var piano = this.piano;
-			var nyatiti = this.nyatiti;
-			piano.playNote(note2Play + octave, vol, phrase2Play[noteIndex][2], offset1);
-			//54.093589 is the base MIDI note for 186Hz baseFreq of kora
-			nyatiti.playNote(note2Play + octave, vol, phrase2Play[noteIndex][2], offset2);
-
-			noteIndex++;
-			if (noteIndex >= phrase2Play.length) {
-				noteIndex = 0;
-			}
-			//counter = Math.floor(5 * Math.random()) + 3;
-			counter = phrase2Play[noteIndex][2];
-			//counter = 3;
-		}
-		//if (that.numberOfReps > 0 && that.isPlaying) {
-		if (that.isPlaying) {
-			timerID = window.setTimeout(tickDownIntermittentSound, that.msPerBeat);
-		} else {
-			//fix this later
-			//timerID = window.setTimeout(finishedPlaying, (bufferDur/pitch) * 1000.);
-		}
-		that.numberOfReps--;
-		
-		counter--;
-		
-	}
+	var beatCountdown = 0;
+	//var countdownToEndOfCurrentNote = 0;
+	//var countdownToEndOfCurrentPause = 0;
 
 	function pitchClassToMultiplier(octave, interval) {
 		var multiplier = Math.pow(2., (12. * octave + interval) / 12.);
@@ -122,46 +92,60 @@ function Plunk(instrument1, instrument2, bpm, ticksPerBeat, minPause, maxPause, 
 	}
 	
 	function beat(msUntilBeat) {
-		countdownToEndOfCurrentNote--;
-		
-		if (countdownToEndOfCurrentNote <= 0) {
-			var note2Play = phrase2Play[noteIndex][0];
-			//var octave = (Math.floor(4 * Math.random()) - 1) * 12;
-			var octave = 0;
-			//note2Play = currentNote;
-			var offset1 = Math.random() * 0.125;
-			var offset2 = Math.random() * 0.125;
-			
-			var vol = phrase2Play[noteIndex][1];
-			//var pianoVol = Math.random();
-			//var nyatitiVol = 1. - pianoVol;
-			//var offset = 0;
-			
-			countdownToEndOfCurrentNote = phrase2Play[noteIndex][2];
-			
-			var piano = this.piano;
-			var nyatiti = this.nyatiti;
-			piano.playNote(msUntilBeat, note2Play + octave, vol, 1., offset1);
-			//54.093589 is the base MIDI note for 186Hz baseFreq of kora
-			nyatiti.playNote(msUntilBeat, note2Play + octave, vol, 1., offset2);
-
-			noteIndex++;
-			if (noteIndex >= phrase2Play.length) {
-				noteIndex = 0;
+		if (!isPausing) {
+			beatCountdown--;
+			if (beatCountdown <= 0) {
+				var note2Play = phrase2Play[noteIndex][0];
+				//var octave = (Math.floor(2 * Math.random()) + 1) * 12;
+				var octave = 0;
+				var offset1 = Math.random() * 0.125;
+				var offset2 = Math.random() * 0.125;
+				
+				var vol = phrase2Play[noteIndex][1];
+				var pianoVol = Math.random();
+				var nyatitiVol = 1. - pianoVol;
+				
+				beatCountdown = phrase2Play[noteIndex][2];
+				
+				var piano = this.piano;
+				var nyatiti = this.nyatiti;
+				piano.playNote(msUntilBeat, note2Play + octave, vol * pianoVol, 1., offset1);
+				//54.093589 is the base MIDI note for 186Hz baseFreq of kora
+				nyatiti.playNote(msUntilBeat, note2Play + octave, vol * nyatitiVol, 1., offset2);
+				
+				noteIndex++;
+				if (noteIndex >= phrase2Play.length) {
+					var phraseID = Math.floor(Math.random() * phrases.length);
+					console.log('next phrase: ' + phraseID);
+					phrase2Play = phrases[phraseID];
+					noteIndex = 0;
+					beatCountdown = Math.floor((1 + that.maxPause - that.minPause) * Math.random()) + that.minPause;
+					if (beatCountdown > 0) {
+						isPausing = true;
+					}
+				}
+				
 			}
-			//counter = Math.floor(5 * Math.random()) + 3;
-			counter = phrase2Play[noteIndex][2];
-			//counter = 3;
+		} else {
+			beatCountdown--;
+			if (beatCountdown <= 0) {
+				isPausing = false;
+			}
 		}
-		
 	}
 	
 	this.play = function() {
 		this.isPlaying = true;
+		
+		var phraseID = Math.floor(Math.random() * phrases.length);
+		console.log('initial phrase: ' + phraseID);
+		phrase2Play = phrases[phraseID];
+		
 		var nextBeatSinceEpoch = this.msPerBeat - (Date.now() % this.msPerBeat);
 		beat(nextBeatSinceEpoch);
 		startTimeInContext = Math.floor(this.instrument1.outputNode.context.currentTime * 1000.) + nextBeatSinceEpoch;
 		console.log(startTimeInContext);
+		
 		this.numberOfReps = Math.floor(((this.maxReps - this.minReps) + 1) * Math.random() + this.minReps);
 		if (this.startWithPause) {
 			//var pauseDur = (that.maxPause - that.minPause) * Math.random() + that.minPause;

@@ -263,7 +263,7 @@ function course1ButtonPressed() {
 	if (buffersAreLoaded) {
 		if (!course1Music.isPlaying) {
 			//chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
-			course1Music = new Plunk(piano, nyatiti, 120., 4, 0.1, 0.1, 28, 28, course1MusicFinished);
+			course1Music = new Plunk(piano, nyatiti, 120., 4, 0, 3, 28, 28, course1MusicFinished);
 			course1Music.connect(gainNode);
 			course1Music.play();
 			//isChirping = true;
