@@ -21,6 +21,7 @@ function Plunk(instrument1, instrument2, bpm, ticksPerBeat, minPause, maxPause, 
 	//I don't think I need this...
 	this.completionCallback = completionCallback;
 	
+	var beatsToPause = 4;
 	
 	// private variables
 	
@@ -42,7 +43,7 @@ function Plunk(instrument1, instrument2, bpm, ticksPerBeat, minPause, maxPause, 
 	//this is in beats
 	var durationOfSecondNote = 3;
 	var counter = 0;
-	var lookAheadTime = 200;
+	var lookAheadTime = 500;
 	
 	var beats = [];
 	
@@ -63,9 +64,9 @@ function Plunk(instrument1, instrument2, bpm, ticksPerBeat, minPause, maxPause, 
 			
 			var piano = this.piano;
 			var nyatiti = this.nyatiti;
-			piano.playNote(note2Play + octave, vol, 1., offset1);
+			piano.playNote(note2Play + octave, vol, phrase2Play[noteIndex][2], offset1);
 			//54.093589 is the base MIDI note for 186Hz baseFreq of kora
-			nyatiti.playNote(note2Play + octave, vol, 1., offset2);
+			nyatiti.playNote(note2Play + octave, vol, phrase2Play[noteIndex][2], offset2);
 
 			noteIndex++;
 			if (noteIndex >= phrase2Play.length) {
@@ -95,6 +96,8 @@ function Plunk(instrument1, instrument2, bpm, ticksPerBeat, minPause, maxPause, 
 	
 	function scheduler() {
 		if (that.isPlaying) {
+			//I feel like I should be doing this for every note that falls within  lookAheadTime
+			//I am not, and yet it still works; at some point investigate why...
 			//console.log("ms since context created:" + Math.floor(that.instrument1.outputNode.context.currentTime * 1000.));
 			var msSincePlay = (Math.floor(that.instrument1.outputNode.context.currentTime * 1000.) - startTimeInContext);
 			console.log("ms since behavior started:" + msSincePlay);
@@ -151,12 +154,12 @@ function Plunk(instrument1, instrument2, bpm, ticksPerBeat, minPause, maxPause, 
 		console.log(startTimeInContext);
 		this.numberOfReps = Math.floor(((this.maxReps - this.minReps) + 1) * Math.random() + this.minReps);
 		if (this.startWithPause) {
-			var pauseDur = (that.maxPause - that.minPause) * Math.random() + that.minPause;
-			timerID = window.setTimeout(tickDownIntermittentSound, pauseDur * 1000.);
+			//var pauseDur = (that.maxPause - that.minPause) * Math.random() + that.minPause;
+			//timerID = window.setTimeout(tickDownIntermittentSound, pauseDur * 1000.);
 		} else {
 			//tickDownIntermittentSound();
 		}
-		scheduler();
+		schedulerTimerID = window.setTimeout(scheduler, nextBeatSinceEpoch);
 	}
 	
 	this.stop = function() {
