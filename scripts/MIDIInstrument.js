@@ -33,9 +33,9 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 		var multiplier;
 		//var scaleDegree = midiNote % 12;
 		var scaleDegree = ((midiNote + 12) - that.basePitchForRetuning) % 12;
-		console.log('MIDI note ' + midiNote + ' is scale degree ' + scaleDegree);
+		//console.log('MIDI note ' + midiNote + ' is scale degree ' + scaleDegree);
 		var octave = Math.floor((midiNote - that.basePitchForRetuning) / 12);
-		console.log('octave: ' + octave);
+		//console.log('octave: ' + octave);
 		
 		var ratioToBaseNote;
 		if (that.retuningMap[scaleDegree]) {
@@ -43,7 +43,7 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 		} else {
 			ratioToBaseNote = Math.pow(2., scaleDegree / 12.);
 		}
-		console.log('ratio of desired note to base note: ' + ratioToBaseNote);
+		//console.log('ratio of desired note to base note: ' + ratioToBaseNote);
 		
 		var scaleDegreeOfReferenceNote = (69 - that.basePitchForRetuning) % 12;
 		var octaveOfReferenceNote = Math.floor((69. - that.basePitchForRetuning) / 12.);
@@ -55,7 +55,7 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 			ratioOfReferenceToBaseNote = Math.pow(2., scaleDegreeOfReferenceNote / 12.);
 		}
 		
-		console.log('ratio of reference note to base note: ' + ratioOfReferenceToBaseNote);
+		//console.log('ratio of reference note to base note: ' + ratioOfReferenceToBaseNote);
 		
 		multiplier = ratioToBaseNote * ((440. / that.baseFreq) / ratioOfReferenceToBaseNote) * Math.pow(2., octave - octaveOfReferenceNote);
 		
@@ -94,7 +94,7 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 		}
 	}
 	
-	this.playNote = function(midiNote, volume, duration, startTime) {
+	this.playNote = function(msUntilStart, midiNote, volume, duration, startTime) {
 		//somewhere in here we should probably error check to make sure an outputNode with an audioContext is connected
 		//var newNow = that.outputNode.context.currentTime + 0.1;
 		//var pitchMultiplier = pitchClassToMultiplier(that.pitchArray[pitchIndex][0], that.pitchArray[pitchIndex][1]);
@@ -115,7 +115,7 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 		//you could use this as a way to have different timing offsets for different devices...
 		//console.log("User-agent header sent: " + navigator.userAgent);
 		//maybe this could help? https://source.android.com/devices/audio/latency_measurements
-		var timeToStart = that.outputNode.context.currentTime + 0.05;
+		var timeToStart = that.outputNode.context.currentTime + (msUntilStart / 1000.) + 0.05;
 		
 		//if duration is less than sum of fade times, scale fade times down proportionately
 		var fadeIn;

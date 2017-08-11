@@ -30,6 +30,9 @@ function Plunk(instrument1, instrument2, bpm, ticksPerBeat, minPause, maxPause, 
 	var that = this;
 	
 	var timerID;
+	var schedulerTimerID;
+	
+	var startTimeInContext = 0;
 	
 	//just for testing
 	var currentNote = 60;
@@ -39,6 +42,9 @@ function Plunk(instrument1, instrument2, bpm, ticksPerBeat, minPause, maxPause, 
 	//this is in beats
 	var durationOfSecondNote = 3;
 	var counter = 0;
+	var lookAheadTime = 200;
+	
+	var beats = [];
 	
 	// making this a private member function
 	function tickDownIntermittentSound() {
@@ -87,20 +93,72 @@ function Plunk(instrument1, instrument2, bpm, ticksPerBeat, minPause, maxPause, 
 		return multiplier;
 	}
 	
+	function scheduler() {
+		if (that.isPlaying) {
+			//console.log("ms since context created:" + Math.floor(that.instrument1.outputNode.context.currentTime * 1000.));
+			var msSincePlay = (Math.floor(that.instrument1.outputNode.context.currentTime * 1000.) - startTimeInContext);
+			console.log("ms since behavior started:" + msSincePlay);
+			if (msSincePlay % that.msPerBeat + lookAheadTime > that.msPerBeat) {
+				var beatCount = Math.floor(msSincePlay / that.msPerBeat) % 10;
+				if (beats[beatCount] != msSincePlay + (that.msPerBeat - (msSincePlay % that.msPerBeat))) {
+					console.log("beat " + beatCount + " in " + (that.msPerBeat - (msSincePlay % that.msPerBeat)) + " ms!");
+					beat(that.msPerBeat - (msSincePlay % that.msPerBeat));
+					beats[beatCount] = msSincePlay + (that.msPerBeat - (msSincePlay % that.msPerBeat));
+				}
+				
+			}
+			//console.log("msSincePlay % that.msPerBeat:" + msSincePlay % that.msPerBeat);
+			//if (msSincePlay % that.msPerBeat)
+			timerID = window.setTimeout(scheduler, 100);
+		}
+	}
+	
+	function beat(msUntilBeat) {
+		var note2Play = phrase2Play[noteIndex][0];
+		//var octave = (Math.floor(4 * Math.random()) - 1) * 12;
+		var octave = 0;
+		//note2Play = currentNote;
+		var offset1 = Math.random() * 0.125;
+		var offset2 = Math.random() * 0.125;
+		
+		var vol = phrase2Play[noteIndex][1];
+		//var pianoVol = Math.random();
+		//var nyatitiVol = 1. - pianoVol;
+		//var offset = 0;
+		
+		var piano = this.piano;
+		var nyatiti = this.nyatiti;
+		piano.playNote(msUntilBeat, note2Play + octave, vol, 1., offset1);
+		//54.093589 is the base MIDI note for 186Hz baseFreq of kora
+		nyatiti.playNote(msUntilBeat, note2Play + octave, vol, 1., offset2);
+
+		noteIndex++;
+		if (noteIndex >= phrase2Play.length) {
+			noteIndex = 0;
+		}
+		//counter = Math.floor(5 * Math.random()) + 3;
+		counter = phrase2Play[noteIndex][2];
+		//counter = 3;
+	}
+	
 	this.play = function() {
 		this.isPlaying = true;
+		startTimeInContext = Math.floor(this.instrument1.outputNode.context.currentTime * 1000.);
+		console.log(startTimeInContext);
 		this.numberOfReps = Math.floor(((this.maxReps - this.minReps) + 1) * Math.random() + this.minReps);
 		if (this.startWithPause) {
 			var pauseDur = (that.maxPause - that.minPause) * Math.random() + that.minPause;
 			timerID = window.setTimeout(tickDownIntermittentSound, pauseDur * 1000.);
 		} else {
-			tickDownIntermittentSound();
+			//tickDownIntermittentSound();
 		}
+		scheduler();
 	}
 	
 	this.stop = function() {
 		if (this.isPlaying) {
 			window.clearTimeout(timerID);
+			window.clearTimeout(schedulerTimerID);
 			this.isPlaying = false;
 			//before you had this in a separate private function, don't see a benefit, but fyi
 			//finishedPlaying();
