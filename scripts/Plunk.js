@@ -98,18 +98,20 @@ function Plunk(instrument1, instrument2, bpm, ticksPerBeat, minPause, maxPause, 
 			//console.log("ms since context created:" + Math.floor(that.instrument1.outputNode.context.currentTime * 1000.));
 			var msSincePlay = (Math.floor(that.instrument1.outputNode.context.currentTime * 1000.) - startTimeInContext);
 			console.log("ms since behavior started:" + msSincePlay);
-			if (msSincePlay % that.msPerBeat + lookAheadTime > that.msPerBeat) {
+			var msSinceLastBeat = msSincePlay % that.msPerBeat;
+			if (msSinceLastBeat + lookAheadTime > that.msPerBeat) {
 				var beatCount = Math.floor(msSincePlay / that.msPerBeat) % 10;
-				if (beats[beatCount] != msSincePlay + (that.msPerBeat - (msSincePlay % that.msPerBeat))) {
-					console.log("beat " + beatCount + " in " + (that.msPerBeat - (msSincePlay % that.msPerBeat)) + " ms!");
+				var timeToNextBeat = that.msPerBeat - msSinceLastBeat;
+				if (beats[beatCount] != msSincePlay + timeToNextBeat) {
+					console.log("beat " + beatCount + " in " + timeToNextBeat + " ms!");
 					beat(that.msPerBeat - (msSincePlay % that.msPerBeat));
-					beats[beatCount] = msSincePlay + (that.msPerBeat - (msSincePlay % that.msPerBeat));
+					beats[beatCount] = msSincePlay + timeToNextBeat;
 				}
 				
 			}
 			//console.log("msSincePlay % that.msPerBeat:" + msSincePlay % that.msPerBeat);
 			//if (msSincePlay % that.msPerBeat)
-			timerID = window.setTimeout(scheduler, 100);
+			schedulerTimerID = window.setTimeout(scheduler, 100);
 		}
 	}
 	
@@ -143,7 +145,9 @@ function Plunk(instrument1, instrument2, bpm, ticksPerBeat, minPause, maxPause, 
 	
 	this.play = function() {
 		this.isPlaying = true;
-		startTimeInContext = Math.floor(this.instrument1.outputNode.context.currentTime * 1000.);
+		var nextBeatSinceEpoch = this.msPerBeat - (Date.now() % this.msPerBeat);
+		beat(nextBeatSinceEpoch);
+		startTimeInContext = Math.floor(this.instrument1.outputNode.context.currentTime * 1000.) + nextBeatSinceEpoch;
 		console.log(startTimeInContext);
 		this.numberOfReps = Math.floor(((this.maxReps - this.minReps) + 1) * Math.random() + this.minReps);
 		if (this.startWithPause) {
