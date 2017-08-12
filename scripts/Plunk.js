@@ -6,10 +6,9 @@
  */
 
 // creating an intermittentSound object with an object constructor
-function Plunk(instrument1, instrument2, bpm, ticksPerBeat, minPause, maxPause, minReps, maxReps, completionCallback) {
+function Plunk(instrument, bpm, ticksPerBeat, minPause, maxPause, minReps, maxReps, completionCallback) {
 	//alert(this);
-	this.instrument1 = instrument1;
-	this.instrument2 = instrument2;
+	this.instrument = instrument;
 	this.msPerBeat = (60000. / (bpm * ticksPerBeat));
 	//in beats, ok?
 	this.minPause = minPause;
@@ -74,7 +73,7 @@ function Plunk(instrument1, instrument2, bpm, ticksPerBeat, minPause, maxPause, 
 			//I feel like I should be doing this for every note that falls within  lookAheadTime
 			//I am not, and yet it still works; at some point investigate why...
 			//console.log("ms since context created:" + Math.floor(that.instrument1.outputNode.context.currentTime * 1000.));
-			var msSincePlay = (Math.floor(that.instrument1.outputNode.context.currentTime * 1000.) - startTimeInContext);
+			var msSincePlay = (Math.floor(that.instrument.outputNode.context.currentTime * 1000.) - startTimeInContext);
 			console.log("ms since behavior started:" + msSincePlay);
 			if (msSincePlay >= 0) {
 				var msSinceLastBeat = msSincePlay % that.msPerBeat;
@@ -101,20 +100,16 @@ function Plunk(instrument1, instrument2, bpm, ticksPerBeat, minPause, maxPause, 
 				var note2Play = phrase2Play[noteIndex][0];
 				//var octave = (Math.floor(2 * Math.random()) + 1) * 12;
 				var octave = 0;
-				var offset1 = Math.random() * 0.125;
-				var offset2 = Math.random() * 0.125;
+				var offset = Math.random() * 0.125;
+				//var offset2 = Math.random() * 0.125;
 				
 				var vol = phrase2Play[noteIndex][1];
-				var pianoVol = Math.random();
-				var nyatitiVol = 1. - pianoVol;
 				
 				beatCountdown = phrase2Play[noteIndex][2];
 				
-				var piano = this.piano;
-				var nyatiti = this.nyatiti;
-				piano.playNote(msUntilBeat, note2Play + octave, vol * pianoVol * 0.3, 0.5, offset1);
+				instrument.playNote(msUntilBeat, note2Play + octave, vol, 0.5, offset);
 				//54.093589 is the base MIDI note for 186Hz baseFreq of kora
-				nyatiti.playNote(msUntilBeat, note2Play + octave, vol * nyatitiVol * 0.3, 0.5, offset2);
+				//nyatiti.playNote(msUntilBeat, note2Play + octave, vol * nyatitiVol * 0.3, 0.5, offset2);
 				
 				noteIndex++;
 				if (noteIndex >= phrase2Play.length) {
@@ -146,7 +141,7 @@ function Plunk(instrument1, instrument2, bpm, ticksPerBeat, minPause, maxPause, 
 		
 		var nextBeatSinceEpoch = this.msPerBeat - (Date.now() % this.msPerBeat);
 		beat(nextBeatSinceEpoch);
-		startTimeInContext = Math.floor(this.instrument1.outputNode.context.currentTime * 1000.) + nextBeatSinceEpoch;
+		startTimeInContext = Math.floor(this.instrument.outputNode.context.currentTime * 1000.) + nextBeatSinceEpoch;
 		console.log(startTimeInContext);
 		
 		this.numberOfReps = Math.floor(((this.maxReps - this.minReps) + 1) * Math.random() + this.minReps);
