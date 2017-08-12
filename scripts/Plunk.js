@@ -112,9 +112,9 @@ function Plunk(instrument1, instrument2, bpm, ticksPerBeat, minPause, maxPause, 
 				
 				var piano = this.piano;
 				var nyatiti = this.nyatiti;
-				piano.playNote(msUntilBeat, note2Play + octave, vol * pianoVol, 0.5, offset1);
+				piano.playNote(msUntilBeat, note2Play + octave, vol * pianoVol * 0.3, 0.5, offset1);
 				//54.093589 is the base MIDI note for 186Hz baseFreq of kora
-				nyatiti.playNote(msUntilBeat, note2Play + octave, vol * nyatitiVol, 0.5, offset2);
+				nyatiti.playNote(msUntilBeat, note2Play + octave, vol * nyatitiVol * 0.3, 0.5, offset2);
 				
 				noteIndex++;
 				if (noteIndex >= phrase2Play.length) {
