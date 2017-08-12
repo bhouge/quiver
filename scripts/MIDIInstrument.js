@@ -115,7 +115,7 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 		//you could use this as a way to have different timing offsets for different devices...
 		//console.log("User-agent header sent: " + navigator.userAgent);
 		//maybe this could help? https://source.android.com/devices/audio/latency_measurements
-		var timeToStart = that.outputNode.context.currentTime + (msUntilStart / 1000.) + 0.05;
+		var timeToStart = that.outputNode.context.currentTime + (msUntilStart / 1000.) + 0.5;
 		
 		//if duration is less than sum of fade times, scale fade times down proportionately
 		var fadeIn;
