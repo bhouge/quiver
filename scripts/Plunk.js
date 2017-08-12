@@ -74,14 +74,14 @@ function Plunk(instrument, bpm, ticksPerBeat, minPause, maxPause, minReps, maxRe
 			//I am not, and yet it still works; at some point investigate why...
 			//console.log("ms since context created:" + Math.floor(that.instrument1.outputNode.context.currentTime * 1000.));
 			var msSincePlay = (Math.floor(that.instrument.outputNode.context.currentTime * 1000.) - startTimeInContext);
-			console.log("ms since behavior started:" + msSincePlay);
+			//console.log("ms since behavior started:" + msSincePlay);
 			if (msSincePlay >= 0) {
 				var msSinceLastBeat = msSincePlay % that.msPerBeat;
 				if (msSinceLastBeat + lookAheadTime > that.msPerBeat) {
 					var beatCount = Math.floor(msSincePlay / that.msPerBeat) % 10;
 					var timeToNextBeat = that.msPerBeat - msSinceLastBeat;
 					if (beats[beatCount] != msSincePlay + timeToNextBeat) {
-						console.log("beat " + beatCount + " in " + timeToNextBeat + " ms!");
+						//console.log("beat " + beatCount + " in " + timeToNextBeat + " ms!");
 						beat(that.msPerBeat - (msSincePlay % that.msPerBeat));
 						beats[beatCount] = msSincePlay + timeToNextBeat;
 					} 				
@@ -114,7 +114,7 @@ function Plunk(instrument, bpm, ticksPerBeat, minPause, maxPause, minReps, maxRe
 				noteIndex++;
 				if (noteIndex >= phrase2Play.length) {
 					var phraseID = Math.floor(Math.random() * phrases.length);
-					console.log('next phrase: ' + phraseID);
+					//console.log('next phrase: ' + phraseID);
 					phrase2Play = phrases[phraseID];
 					noteIndex = 0;
 					beatCountdown = Math.floor((1 + that.maxPause - that.minPause) * Math.random()) + that.minPause;
