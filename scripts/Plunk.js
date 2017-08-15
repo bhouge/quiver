@@ -43,11 +43,14 @@ function Plunk(instrument, bpm, ticksPerBeat, minPause, maxPause, minReps, maxRe
 	               [[65, 0.8, 2], [64, 0.5, 1], [62, 0.9, 1], [61, 0.25, 1], [60, 1., 1], [59, 1., 1], [67, 0.65, 1]],
 	               [[65, 0.7, 2], [64, 0.5, 1], [62, 0.8, 2]],
 	               [[64, 0.8, 2], [65, 0.3, 1], [66, 0.7, 1], [67, 0.6, 1], [66, 0.7, 1], [67, 0.6, 1], [66, 0.7, 1], [67, 0.6, 1]],
+	               [[69, 0.8, 1], [67, 0.7, 1], [64, 0.5, 1], [67, 0.85, 2], [69, 0.5, 1], [64, 0.75, 2]]
 	               ];
 	var phrase1 = [[60, 1., 1], [62, 0.8, 1], [64, 0.5, 2], [60, 0.35, 1], [67, 1., 2], [59, 0.65, 1]];
 	var phrase2 = [[72, 1., 1], [71, 0.8, 1], [69, 0.5, 2], [71, 0.35, 1], [67, 1., 2], [62, 0.65, 1]];
 	var phrase3 = [[65, 0.8, 2], [64, 0.5, 1], [62, 0.9, 1], [61, 0.25, 1], [60, 1., 1], [59, 1., 1], [67, 0.65, 1]];
 	//var phrase4 = 
+	
+	var phrasePlayer = new PhrasePlayer(phrases, 8, 8);
 	
 	var phrase2Play;
 	
@@ -94,6 +97,7 @@ function Plunk(instrument, bpm, ticksPerBeat, minPause, maxPause, minReps, maxRe
 	}
 	
 	function beat(msUntilBeat) {
+		/*
 		if (!isPausing) {
 			beatCountdown--;
 			if (beatCountdown <= 0) {
@@ -129,6 +133,17 @@ function Plunk(instrument, bpm, ticksPerBeat, minPause, maxPause, minReps, maxRe
 			if (beatCountdown <= 0) {
 				isPausing = false;
 			}
+		}
+		*/
+		var noteToPlay = phrasePlayer.beat();
+		if (noteToPlay) {
+			var note2Play = noteToPlay[0];
+			//var octave = (Math.floor(2 * Math.random()) + 1) * 12;
+			var octave = 0;
+			var offset = Math.random() * 0.125;
+			//var offset2 = Math.random() * 0.125;
+			var vol = noteToPlay[1];
+			instrument.playNote(msUntilBeat, note2Play + octave, vol, 0.5, offset);
 		}
 	}
 	
