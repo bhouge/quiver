@@ -59,7 +59,6 @@ This web page will also work on a laptop (in which case inverting the device is 
 <script src="/socket.io/socket.io.js"></script>
 <script src="scripts/MIDIInstrument.js"></script>
 <script src="scripts/PhrasePlayer.js"></script>
-<script src="scripts/IntermittentSound.js"></script>
 <script src="scripts/Plunk.js"></script>
 <script src="scripts/Evolve.js"></script>
 
@@ -84,39 +83,35 @@ socket.on('control message', function(msg){
 				switch (parseInt(lastPart[0], 10)) {
 					case 0:
 						console.log('slider 0 value: ' + sliderFloatValue);
-						minVol = sliderFloatValue;
+						//minVol = sliderFloatValue;
 						break;
 					case 1:
 						console.log('slider 1 value: ' + sliderFloatValue);
-						maxVol = sliderFloatValue;
+						//maxVol = sliderFloatValue;
 						break;
 					case 2:
 						console.log('slider 2 value: ' + sliderFloatValue);
-						minChirpPause = maxChirpLimit * sliderFloatValue;
-						console.log('setting min chirp pause to ' + minChirpPause + ' ms.');
+						//minChirpPause = maxChirpLimit * sliderFloatValue;
 						break;
 					case 3:
 						console.log('slider 3 value: ' + sliderFloatValue);
-						maxChirpPause = maxChirpLimit * sliderFloatValue;
-						console.log('setting max chirp pause to ' + maxChirpPause + ' ms.');
+						//maxChirpPause = maxChirpLimit * sliderFloatValue;
 						break;
 					case 4:
 						console.log('slider 4 value: ' + sliderFloatValue);
-						minVolleyPause = maxVolleyLimit * sliderFloatValue;
-						console.log('setting min chirp pause to ' + minVolleyPause + ' ms.');
+						//minVolleyPause = maxVolleyLimit * sliderFloatValue;
 						break;
 					case 5:
 						console.log('slider 5 value: ' + sliderFloatValue);
-						maxVolleyPause = maxVolleyLimit * sliderFloatValue;
-						console.log('setting max chirp pause to ' + maxVolleyPause + ' ms.');
+						//maxVolleyPause = maxVolleyLimit * sliderFloatValue;
 						break;
 					case 6:
 						console.log('slider 6 value: ' + sliderIntValue);
-						minChirps = sliderIntValue;
+						//minChirps = sliderIntValue;
 						break;
 					case 7:
 						console.log('slider 7 value: ' + sliderIntValue);
-						maxChirps = sliderIntValue;
+						//maxChirps = sliderIntValue;
 						break;
 					default:
 						console.log('Not a valid slider.');
@@ -127,6 +122,7 @@ socket.on('control message', function(msg){
 			}
 		}
 	} else {
+		//this is where you implement panic mode
 		stopEverything();
 	}
 });
@@ -160,45 +156,14 @@ socket.on('audio', function(msg){
       });
 });
 
-var timerID;
-var minVol = 0.7;
-var maxVol = 0.8;
-//min limits are 0, units are ms
-var maxChirpLimit = 10000;
-var maxVolleyLimit = 10000;
-var minChirpPause = 0.1 * maxChirpLimit;
-var maxChirpPause = 0.25 * maxChirpLimit;
-var minVolleyPause = 0.45 * maxVolleyLimit;
-var maxVolleyPause = 0.75 * maxVolleyLimit;
-var minChirps = 2;
-var maxChirps = 5;
-var chirpsRemaining = 0;
-var birdVariations = 0;
-
 var audioFilesToReceive = 0;
-
 var numberOfButtons = 5;
 
 var piano;
 var nyatiti;
 var vibes;
 
-
-function playSound(index) {
-	var source = audioCtx.createBufferSource();
-	source.buffer = audioBuffers[index];
-	gainNode.gain.value = Math.random() * (maxVol - minVol) + minVol;
-	//gainNode.gain.value = Math.random();
-	source.connect(gainNode);
-    source.start(audioCtx.currentTime);
-}
-
-
-//gotta rethink this fo sho
-var listenButtonEnabled = true;
-var isChirping = false;
-//var listenButton = document.getElementById('listen');
-
+//would it make more sense to have these in an array?
 var course1Button = document.getElementById('course1');
 var course2Button = document.getElementById('course2');
 var course3Button = document.getElementById('course3');
@@ -211,64 +176,27 @@ course3Button.onclick = course3ButtonPressed;
 course4Button.onclick = course3ButtonPressed;
 course5Button.onclick = course3ButtonPressed;
 
-/*
-var buttons = document.getElementById("controlButtons");
-
-for (var i = 0; i < numberOfButtons; i++) {
-	var button = document.createElement("button");
-	button.setAttribute("class", "off");
-	button.setAttribute("id", "course" + i + 1);
-	button.innerHTML = 'LOADING...';
-	button.onclick = function() {
-		if (buffersAreLoaded) {
-			if (!isChirping) {
-				chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
-				chirp(i);
-				isChirping = true;
-				this.innerHTML = 'STOP LISTENING';
-			} else {
-				window.clearTimeout(timerID);
-				isChirping = false;
-				this.innerHTML = 'LISTEN';
-			}
-		}
-	};
-	var buttonDescriptor = document.createTextNode("Course " + i + ":"); 
-	var br = document.createElement("br");
-	//evidently you can only append an element once? therefore I am creating two br elements
-	var br2 = document.createElement("br");
-	buttons.appendChild(buttonDescriptor); 
-	buttons.appendChild(br);
-	buttons.appendChild(button);
-	if (i < numberOfButtons - 1) {
-		buttons.appendChild(br2);
-	}
-	
-	
-	button.setAttribute("disabled", true);
-	
-	button.onclick = function () {
-		var button = this;
-		var index = button.id.slice(4);
-		if (button.className == "off") {
-			buttonActivated(index);
-		} else {
-			buttonDeactivated(index);
-		}
-	}
-	
-	buttons.appendChild(button);
-	if (i==2 || i==6 || i==8 || i==14 || i==19) {
-		var br = document.createElement("br");
-        buttons.appendChild(br);
-	}
-	
-}
- */
-
 var course1Music = { 'isPlaying' : false };
 var course2Music = { 'isPlaying' : false };
 var course3Music = { 'isPlaying' : false };
+var course4Music = { 'isPlaying' : false };
+var course5Music = { 'isPlaying' : false };
+ 
+
+//keeping this as a way to test sounds if needed
+function playBuffer(index) {
+	var source = audioCtx.createBufferSource();
+	source.buffer = audioBuffers[index];
+	gainNode.gain.value = 1.0;
+	source.connect(gainNode);
+  source.start(audioCtx.currentTime);
+}
+
+
+function stopEverything() {
+	//not sure we need to implement this for WAC 2017, but here's where you could...
+}
+
  
 function course1ButtonPressed() {
 	if (buffersAreLoaded) {
@@ -299,7 +227,7 @@ function course2ButtonPressed() {
 	if (buffersAreLoaded) {
 		if (!course2Music.isPlaying) {
 			//chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
-			course2Music = new Evolve([piano, nyatiti], 0.1, 0.1, 28, 28, course2MusicFinished);
+			course2Music = new Plunk(piano, 120., 4, 0, 3, 28, 28, course1MusicFinished);
 			course2Music.connect(gainNode);
 			//course2Music.playNote(2.2, 1., 1., 0.5);
 			course2Music.play();
@@ -344,44 +272,6 @@ function course3MusicFinished() {
 	course3Button.innerHTML = 'LISTEN';
 }
 
-function chirp() {
-	var bufferToPlay;
-	if (listenButtonEnabled && audioBuffers.length > 0) {
-		//hopefully this little check will catch the case when all buffers might not yet have been received,
-		//since they arrive asynchronously
-		//and hopefully we are making sure that the button will not be enabled until at least one buffer has been received.
-		do {
-			bufferToPlay = Math.floor(Math.random() * audioBuffers.length);
-		} while (!audioBuffers[bufferToPlay]);
-	}
-	playSound(bufferToPlay);
-	chirpsRemaining--;
-	console.log('chirpsRemaining: ' + chirpsRemaining);
-	var pauseDur;
-	if (chirpsRemaining > 0) {
-		pauseDur = Math.random() * (maxChirpPause - minChirpPause) + minChirpPause;
-	} else {
-		pauseDur = Math.random() * (maxVolleyPause - minVolleyPause) + minVolleyPause;
-		console.log('chirpsRemaining is 0 or less, so picking new volley time of ' + pauseDur);
-		var randomNumber = Math.random();
-		//console.log('randomNumber: ' + randomNumber);
-		//console.log('minChirps: ' + minChirps + '; maxChirps: ' + maxChirps);
-		//console.log('maxChirps - minChirps: ' + (maxChirps - minChirps));
-		//console.log('1 + maxChirps - minChirps: ' + (1 + maxChirps - minChirps));
-		//console.log('Math.random() * (1 + maxChirps - minChirps): ' + (randomNumber * (1 + maxChirps - minChirps)));
-		//console.log('Math.random() * (1 + maxChirps - minChirps) + minChirps: ' + (randomNumber * (1 + maxChirps - minChirps) + minChirps));
-		//console.log('Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps: ' + (Math.floor(randomNumber * (1 + maxChirps - minChirps)) + minChirps));
-		chirpsRemaining = Math.floor(randomNumber * (1 + maxChirps - minChirps)) + minChirps;
-		console.log('new chirpsRemaining: ' + chirpsRemaining);
-	}
-	//add length of sample
-	pauseDur += audioBuffers[bufferToPlay].duration * 1000.0;
-	timerID = window.setTimeout(chirp, pauseDur);
-}
-
-function stopEverything() {
-	//not sure we need to implement this for Oxford...
-}
 
 function commandReceived(commandID) {
 	console.log('command: ' + commandID);
@@ -440,17 +330,18 @@ function initializeInstruments() {
 	//33/32 (64/33)
 	//81/80 (160/81)
 
-	
 	//baseFreq 698.456463 Hz is MIDI note 77 (a high F)
 	piano = new MIDIInstrument(audioBuffers[3], 698.456463, 0.01, 0.1);
 	piano.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 12/7, 16/9, 64/33];
 	piano.basePitchForRetuning = 0;
 	piano.connect(gainNode);
+	
 	//baseFreq 186Hz is MIDI note 54.093589 (a little sharp of F# below middle C)
 	nyatiti = new MIDIInstrument(audioBuffers[2], 186., 0.01, 0.5);
 	nyatiti.retuningMap = piano.retuningMap;
 	nyatiti.basePitchForRetuning = 0;
 	nyatiti.connect(gainNode);
+	
 	//baseFreq 523.251131 Hz is MIDI note 72 (C above middle C, not sure why wave file is mislabeled)
 	vibes = new MIDIInstrument(audioBuffers[0], 523.251131, 0.01, 0.5);
 	vibes.retuningMap = piano.retuningMap;
