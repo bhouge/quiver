@@ -43,7 +43,7 @@ function PhrasePlayer(phrases, minPause, maxPause) {
 				//var vol = phrase2Play[noteIndex][1];
 				
 				//will change this to be 0, not 2
-				beatCountdown = this.phrases[currentPhraseIndex][noteIndex][2];
+				beatCountdown = this.phrases[currentPhraseIndex][noteIndex][0];
 				
 				noteIndex++;
 				if (noteIndex >= this.phrases[currentPhraseIndex].length) {
