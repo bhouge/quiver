@@ -9,15 +9,18 @@
 		-webkit-appearance: none;
 		padding: 25px 5px;
 		text-align: center;
-		width: 90%;
+		width: 97%;
 		font-size: 64px;
 		font-weight: bold;
+	}
+	.button2 {
+		width: 32%;
 	}
 	.sliders {
     margin: auto;
     width: 50%;
     padding: 10px;
-}
+	}
 </style>
 </head>
 <body>
@@ -32,14 +35,16 @@ The term gastromorphology may be used to describe a meal as a function of time.
 </p>
 
 <div id="controlButtons">
-First Course:
-<button id="course1" class="off">LOADING...</button>
+First Course:<br>
+<button id="course1" value="off">LOADING...</button>
 <br><br>
-Second Course:
-<button id="course2" class="off">LOADING...</button>
+Second Course:<br>
+<button id="course2" value="off">LOADING...</button>
 <br><br>
-Third Course:
-<button id="course3" class="off">LOADING...</button>
+Third Course:<br>
+<button id="course3" class="button2" value="off">LOADING...</button>
+<button id="course4" class="button2" value="off">LOADING...</button>
+<button id="course5" class="button2" value="off">LOADING...</button>
 </div>
 
 <h3>
@@ -172,7 +177,7 @@ var birdVariations = 0;
 
 var audioFilesToReceive = 0;
 
-var numberOfButtons = 3;
+var numberOfButtons = 5;
 
 var piano;
 var nyatiti;
@@ -197,10 +202,14 @@ var isChirping = false;
 var course1Button = document.getElementById('course1');
 var course2Button = document.getElementById('course2');
 var course3Button = document.getElementById('course3');
+var course4Button = document.getElementById('course4');
+var course5Button = document.getElementById('course5');
 
 course1Button.onclick = course1ButtonPressed;
 course2Button.onclick = course2ButtonPressed;
 course3Button.onclick = course3ButtonPressed;
+course4Button.onclick = course3ButtonPressed;
+course5Button.onclick = course3ButtonPressed;
 
 /*
 var buttons = document.getElementById("controlButtons");
