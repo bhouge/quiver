@@ -22,7 +22,7 @@ function PhrasePlayer(phrases, minPause, maxPause) {
 	var that = this;
 	
 	var beatCountdown = 0;
-	var currentPhraseIndex = 0;
+	var currentPhraseIndex = Math.floor(Math.random() * this.phrases.length);
 	var noteIndex = 0;
 	var isPausing = 0;
 	
@@ -34,15 +34,6 @@ function PhrasePlayer(phrases, minPause, maxPause) {
 				var noteToPlay = this.phrases[currentPhraseIndex][noteIndex];
 				console.log('currentNote: ' + noteToPlay);
 				
-				//all of this goes in the parent musical behavior:
-				//var note2Play = this.phrases[currentPhraseIndex][noteIndex][0];
-				//var octave = (Math.floor(2 * Math.random()) + 1) * 12;
-				//var octave = 0;
-				//var offset = Math.random() * 0.125;
-				//var offset2 = Math.random() * 0.125;
-				//var vol = phrase2Play[noteIndex][1];
-				
-				//will change this to be 0, not 2
 				beatCountdown = this.phrases[currentPhraseIndex][noteIndex][0];
 				
 				noteIndex++;
