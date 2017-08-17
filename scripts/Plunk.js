@@ -26,11 +26,12 @@ function Plunk(instrument, bpm, ticksPerBeat, minPause, maxPause, minReps, maxRe
 	var schedulerTimerID;
 	var startTimeInContext = 0;
 	var lookAheadTime = 500;
+	var schedulerInterval = 100;
 	var beats = [];
 
 	//layer 1 variables
 	//let's define notes as metric duration (in beats), pitch (MIDI), volume (0-1), sounding duration
-	var phrases = [
+	var layer1Phrases = [
 	               [[1, 60, 1., 1], [1, 62, 0.8, 1], [2, 64, 0.5, 2], [1, 60, 0.35, 1], [2, 67, 1., 2], [1, 59, 0.65, 1]],
 	               [[1, 72, 1., 1], [1, 71, 0.8, 1], [2, 69, 0.5, 2], [1, 71, 0.35, 1], [2, 67, 1., 2], [1, 62, 0.65, 1]],
 	               [[2, 65, 0.8, 2], [1, 64, 0.5, 1], [1, 62, 0.9, 1], [1, 61, 0.25, 1], [1, 60, 1., 1], [1, 59, 1., 1], [1, 67, 0.65, 1]],
@@ -39,7 +40,15 @@ function Plunk(instrument, bpm, ticksPerBeat, minPause, maxPause, minReps, maxRe
 	               [[1, 69, 0.8, 1], [1, 67, 0.7, 1], [1, 64, 0.5, 1], [2, 67, 0.85, 2], [1, 69, 0.5, 1], [2, 64, 0.75, 2]]
 	               ];
 	
-	var phrasePlayer = new PhrasePlayer(phrases, 4, 12);
+	var layer1 = new PhrasePlayer(layer1Phrases, 0, 0, 0, 0, 8, 12);
+	
+	var layer2Phrases = [
+	               [[1, 48, 1., 1], [2, 50, 0.8, 1]],
+	               [[1, 47, 1., 1], [2, 48, 0.8, 1]],
+	               [[1, 48, 1., 1], [2, 52, 0.8, 1]]
+	               ];
+	
+	var layer2 = new PhrasePlayer(layer2Phrases, 2, 5, 3, 5, 5, 8);
 
 	
 	function scheduler() {
@@ -63,12 +72,26 @@ function Plunk(instrument, bpm, ticksPerBeat, minPause, maxPause, minReps, maxRe
 			}
 			//console.log("msSincePlay % that.msPerBeat:" + msSincePlay % that.msPerBeat);
 			//if (msSincePlay % that.msPerBeat)
-			schedulerTimerID = window.setTimeout(scheduler, 100);
+			schedulerTimerID = window.setTimeout(scheduler, schedulerInterval);
 		}
 	}
 	
 	function beat(msUntilBeat) {
-		var noteToPlay = phrasePlayer.beat();
+		//do this for each layer
+		//layer 1
+		var noteToPlay;
+		noteToPlay = layer1.beat();
+		if (noteToPlay) {
+			var note2Play = noteToPlay[1];
+			//var octave = (Math.floor(2 * Math.random()) + 1) * 12;
+			var octave = 0;
+			var offset = Math.random() * 0.125;
+			//var offset2 = Math.random() * 0.125;
+			var vol = noteToPlay[2];
+			instrument.playNote(msUntilBeat, note2Play + octave, vol, 0.5, offset);
+		}
+		//layer 2
+		noteToPlay = layer2.beat();
 		if (noteToPlay) {
 			var note2Play = noteToPlay[1];
 			//var octave = (Math.floor(2 * Math.random()) + 1) * 12;
