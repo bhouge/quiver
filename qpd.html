@@ -59,6 +59,7 @@ This web page will also work on a laptop (in which case inverting the device is 
 <script src="/socket.io/socket.io.js"></script>
 <script src="scripts/MIDIInstrument.js"></script>
 <script src="scripts/PhrasePlayer.js"></script>
+<script src="scripts/Bite.js"></script>
 <script src="scripts/Plunk.js"></script>
 <script src="scripts/Evolve.js"></script>
 
@@ -246,9 +247,14 @@ function course3ButtonPressed() {
 	if (buffersAreLoaded) {
 		if (!course3Music.isPlaying) {
 			//chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
-			course3Music = new IntermittentSound(audioBuffers[3], 0.145, 0.5, 10, 15, 0.5, 0.9, 0.1, 2.0, [[0,0]], false, course3MusicFinished);
-			course3Music.connect(gainNode);
-			course3Music.play();
+			//course3Music = new IntermittentSound(audioBuffers[3], 0.145, 0.5, 10, 15, 0.5, 0.9, 0.1, 2.0, [[0,0]], false, course3MusicFinished);
+			//course3Music.connect(gainNode);
+			//course3Music.play();
+			
+			course3Music.play(1);
+			//nyatiti.playNote(0, 84, 1.0, 0.5, 0.1);
+			//nyatiti.playNote(20, 85, 1.0, 0.5, 0.1);
+			//nyatiti.playNote(40, 86, 1.0, 0.5, 0.1);
 			//isChirping = true;
 			course3Button.innerHTML = 'STOP LISTENING';
 		} else {
@@ -347,6 +353,18 @@ function initializeInstruments() {
 	vibes.retuningMap = piano.retuningMap;
 	vibes.basePitchForRetuning = 0;
 	vibes.connect(gainNode);
+	
+	//baseFreq 698.456463 Hz is MIDI note 77 (a high F)
+	bitePiano = new MIDIInstrument(audioBuffers[3], 698.456463, 0.01, 0.1);
+	bitePiano.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 12/7, 15/8, 64/33];
+	bitePiano.basePitchForRetuning = 0;
+	
+	bitePiano.connect(biteGainNode);
+	
+	
+	
+	//setting up course3, since it is one persistent object that can be pressed manytimes...
+	course3Music = new Bite([bitePiano], [0, 2, 4, 5, 7, 9, 11]);
 }
 
 //setting up our audio context and creating our master gain
@@ -354,8 +372,25 @@ var AudioContext = window.AudioContext || window.webkitAudioContext;
 var audioCtx = new AudioContext();
 
 var gainNode = audioCtx.createGain();
-gainNode.connect(audioCtx.destination);
 gainNode.gain.value = 1.0;
+gainNode.connect(audioCtx.destination);
+
+var delayFeedbackNode = audioCtx.createGain();
+delayFeedbackNode.gain.value = 0.5;
+
+var delayNode = audioCtx.createDelay(5.0);
+delayNode.delayTime.value = 1.0;
+delayNode.connect(gainNode);
+delayNode.connect(delayFeedbackNode);
+delayFeedbackNode.connect(delayNode);
+//delayFeedbackNode.connect(gainNode);
+
+var biteGainNode = audioCtx.createGain();
+biteGainNode.gain.value = 1.0;
+biteGainNode.connect(gainNode);
+biteGainNode.connect(delayFeedbackNode);
+
+
 
 var audioBuffers = [];
 var buffersAreLoaded = false;
