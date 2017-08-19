@@ -164,6 +164,7 @@ var numberOfButtons = 5;
 var piano;
 var nyatiti;
 var vibes;
+var biteChimes;
 
 //would it make more sense to have these in an array?
 var course1Button = document.getElementById('course1');
@@ -256,6 +257,7 @@ function course3ButtonPressed() {
 		//hmm, kinda hacky...
 		var buttonPressed = parseFloat(this.id[this.id.length-1], 10); 
 		console.log(buttonPressed);
+		//remember, we're doing high to low, so sour, sweet, spicy
 		if (!course3Music.isPlaying) {
 			//chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
 			//course3Music = new IntermittentSound(audioBuffers[3], 0.145, 0.5, 10, 15, 0.5, 0.9, 0.1, 2.0, [[0,0]], false, course3MusicFinished);
@@ -268,11 +270,31 @@ function course3ButtonPressed() {
 				//isChirping = true;
 				break;
 			case 4:
+				//pick how many notes
+				//pick what notes
+				//pick start times
+				//pick durations
+				//pick offsets
+				var howManyNotes = Math.floor(Math.random() * 3) + 1;
+				for (var i = 0; i < howManyNotes; i++) {
+					var noteToPlay = Math.floor(Math.random() * 5) + 60;
+					var startTime;
+					if (i == 0) {
+						startTime = 0;
+					} else {
+						startTime = Math.random() * 10.;
+					}
+					var volume = Math.random() * 0.75 + 0.25;
+					var duration = Math.random() * 20.0 + 10.0;
+					var offset = Math.random() * 15.0;
+					//startDelay, note, volume, duration, offset (into buffer)
+					biteChimes.playNote(startTime, noteToPlay, volume, duration, offset);
+				}
+				break;
+			case 5:
 				nyatiti.playNote(0, 84, 1.0, 0.5, 0.1);
 				nyatiti.playNote(20, 85, 1.0, 0.5, 0.1);
 				nyatiti.playNote(40, 86, 1.0, 0.5, 0.1);
-				break;
-			case 5:
 				break;
 			}
 			
@@ -382,7 +404,7 @@ function initializeInstruments() {
 	bitePiano.connect(biteGainNode);
 	
 	//arbitrarily deciding base note for chimes is A4
-	biteChimes = new MIDIInstrument(audioBuffers[0], 440., 0.15, 0.15);
+	biteChimes = new MIDIInstrument(audioBuffers[4], 440., 0.15, 0.15);
 	biteChimes.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 12/7, 15/8, 64/33];
 	biteChimes.basePitchForRetuning = 0;
 	biteChimes.connect(biteFilterNode);
