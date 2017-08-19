@@ -35,16 +35,16 @@ The term gastromorphology may be used to describe a meal as a function of time.
 </p>
 
 <div id="controlButtons">
-First Course:<br>
-<button id="course1" value="off">LOADING...</button>
+First Course: PRALINE PROGRESSION<br>
+<button id="course1" value="off" disabled>PLAY</button>
 <br><br>
-Second Course:<br>
-<button id="course2" value="off">LOADING...</button>
+Second Course: MISO SOUP?<br>
+<button id="course2" value="off" disabled>PLAY</button>
 <br><br>
-Third Course:<br>
-<button id="course3" class="button2" value="off">LOADING...</button>
-<button id="course4" class="button2" value="off">LOADING...</button>
-<button id="course5" class="button2" value="off">LOADING...</button>
+Third Course: MONOCHROMATIC JELLIES<br>
+<button id="course3" class="button2" value="off" disabled>SOUR</button>
+<button id="course4" class="button2" value="off" disabled>SWEET</button>
+<button id="course5" class="button2" value="off" disabled>SPICY</button>
 </div>
 
 <h3>
@@ -148,7 +148,8 @@ socket.on('audio', function(msg){
     		initializeInstruments();
     		for (var i = 0; i < numberOfButtons; i++) {
     			var courseButton = document.getElementById('course' + (i + 1));
-    			courseButton.innerHTML = 'LISTEN';
+    			//courseButton.innerHTML = 'LISTEN';
+    			courseButton.disabled = false;
     		}
     	}
       }, 
@@ -213,12 +214,12 @@ function course1ButtonPressed() {
 			//course1Music.connect(gainNode);
 			course1Music.play();
 			//isChirping = true;
-			course1Button.innerHTML = 'STOP LISTENING';
+			course1Button.innerHTML = 'STOP';
 		} else {
 			//window.clearTimeout(timerID);
 			course1Music.stop();
 			//isChirping = false;
-			course1Button.innerHTML = 'LISTEN';
+			course1Button.innerHTML = 'PLAY';
 		}
 	}
 }
@@ -227,55 +228,75 @@ function course1ButtonPressed() {
 function course2ButtonPressed() {
 	if (buffersAreLoaded) {
 		if (!course2Music.isPlaying) {
-			//chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
-			course2Music = new Plunk(piano, 120., 4, 0, 3, 28, 28, course1MusicFinished);
-			course2Music.connect(gainNode);
+			//course2Music = new Plunk(piano, 120., 4, 0, 3, 28, 28, course1MusicFinished);
 			//course2Music.playNote(2.2, 1., 1., 0.5);
-			course2Music.play();
-			//isChirping = true;
-			course2Button.innerHTML = 'STOP LISTENING';
+			//course2Music.play();
+			//var startTime = Math.random() * 10.0;
+			
+			//ok, pick this up later, encapsulate it...
+			//something wrong with envelope...
+			//also with multiple button presses (decide if this should be possible)
+			course2Music.isPlaying = true;
+			vibes.playNoteWithFilter(0, 60, 1., 10., 2.0);
+			
+			course2Button.innerHTML = 'STOP';
 		} else {
 			//window.clearTimeout(timerID);
-			course2Music.stop();
+			//course2Music.stop();
+			//put this inside the object, so all you have to do is play/stop
+			course2Music.isPlaying = false;
 			//isChirping = false;
-			course2Button.innerHTML = 'LISTEN';
+			course2Button.innerHTML = 'PLAY';
 		}
 	}
 }
 
 function course3ButtonPressed() {
 	if (buffersAreLoaded) {
+		//hmm, kinda hacky...
+		var buttonPressed = parseFloat(this.id[this.id.length-1], 10); 
+		console.log(buttonPressed);
 		if (!course3Music.isPlaying) {
 			//chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
 			//course3Music = new IntermittentSound(audioBuffers[3], 0.145, 0.5, 10, 15, 0.5, 0.9, 0.1, 2.0, [[0,0]], false, course3MusicFinished);
 			//course3Music.connect(gainNode);
 			//course3Music.play();
 			
-			course3Music.play(1);
-			//nyatiti.playNote(0, 84, 1.0, 0.5, 0.1);
-			//nyatiti.playNote(20, 85, 1.0, 0.5, 0.1);
-			//nyatiti.playNote(40, 86, 1.0, 0.5, 0.1);
-			//isChirping = true;
-			course3Button.innerHTML = 'STOP LISTENING';
+			switch(buttonPressed) {
+			case 3:
+				course3Music.play(buttonPressed - 2);
+				//isChirping = true;
+				break;
+			case 4:
+				nyatiti.playNote(0, 84, 1.0, 0.5, 0.1);
+				nyatiti.playNote(20, 85, 1.0, 0.5, 0.1);
+				nyatiti.playNote(40, 86, 1.0, 0.5, 0.1);
+				break;
+			case 5:
+				break;
+			}
+			
+			
+			//course3Button.innerHTML = 'STOP LISTENING';
 		} else {
 			//window.clearTimeout(timerID);
 			course3Music.stop();
 			//isChirping = false;
-			course3Button.innerHTML = 'LISTEN';
+			//course3Button.innerHTML = 'LISTEN';
 		}
 	}
 }
 
 function course1MusicFinished() {
-	course1Button.innerHTML = 'LISTEN';
+	//course1Button.innerHTML = 'LISTEN';
 }
 
 function course2MusicFinished() {
-	course2Button.innerHTML = 'LISTEN';
+	//course2Button.innerHTML = 'LISTEN';
 }
 
 function course3MusicFinished() {
-	course3Button.innerHTML = 'LISTEN';
+	//course3Button.innerHTML = 'LISTEN';
 }
 
 
@@ -355,16 +376,21 @@ function initializeInstruments() {
 	vibes.connect(gainNode);
 	
 	//baseFreq 698.456463 Hz is MIDI note 77 (a high F)
-	bitePiano = new MIDIInstrument(audioBuffers[3], 698.456463, 0.01, 0.1);
+	bitePiano = new MIDIInstrument(audioBuffers[3], 698.456463, 0.1, 0.1);
 	bitePiano.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 12/7, 15/8, 64/33];
 	bitePiano.basePitchForRetuning = 0;
-	
 	bitePiano.connect(biteGainNode);
+	
+	//arbitrarily deciding base note for chimes is A4
+	biteChimes = new MIDIInstrument(audioBuffers[0], 440., 0.15, 0.15);
+	biteChimes.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 12/7, 15/8, 64/33];
+	biteChimes.basePitchForRetuning = 0;
+	biteChimes.connect(biteFilterNode);
 	
 	
 	
 	//setting up course3, since it is one persistent object that can be pressed manytimes...
-	course3Music = new Bite([bitePiano], [0, 2, 4, 5, 7, 9, 11]);
+	course3Music = new Bite([bitePiano, biteChimes], [0, 2, 4, 5, 7, 9, 11]);
 }
 
 //setting up our audio context and creating our master gain
@@ -390,6 +416,9 @@ biteGainNode.gain.value = 1.0;
 biteGainNode.connect(gainNode);
 biteGainNode.connect(delayFeedbackNode);
 
+var biteFilterNode = audioCtx.createBiquadFilter();
+biteFilterNode.frequency.value = 10000;
+biteFilterNode.connect(biteGainNode);
 
 
 var audioBuffers = [];
