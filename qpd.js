@@ -15,11 +15,25 @@ var mysteryUserCount = 0;
 
 //var birdFileGroups = [0, 3, 8, 13, 18, 23, 28, 33, 40, 45, 50, 53, 58, 63, 68, 73, 76];
 
+//ok, instead of an array with arbitrary indices, give each file a handy instrument name
+//that way, if you add or replace samples here, you don't need to change it on the receiving end
+var fileNames = {
+		vibes: "BowedVibesC#5d.mp3",
+        clarinet: "CL_Swell_B4.mp3",
+        nyatiti: "Kora1_F3_a.mp3",
+        piano: "AplombPR_F01.mp3",
+        windchimes: "windchimes.mp3",
+        marimba: "Marimba_D5.mp3"
+};
+
+/*
+ * old way...
 var fileNames = ["BowedVibesC#5d.mp3",
                    "CL_Swell_B4.mp3",
                    "Kora1_F3_a.mp3",
                    "AplombPR_F01.mp3",
                    "windchimes.mp3"];
+                   */
 
 /*
 var birdFileNames = [
@@ -239,16 +253,30 @@ io.on('connection', function(socket){
     		//pushSoundToClient(fileToPush, 0, socket);
 	    	
 	    	//tell listener how many audio files to expect
-	    	socket.emit('sending audio', fileNames.length);
+	    	
+	    	var numberOfFilesToSend = Object.keys(fileNames).length
+	    	
+	    	//don't change this format! 'sending audio' is a specially formatted command!
+	    	socket.emit('sending audio', Object.keys(fileNames).length);
 	    	
 	    	//send the audio files
-	    	for (var i = 0; i < fileNames.length ; i++) {
+	    	for (var instrument in fileNames) {
+	    		console.log(fileNames[instrument]);
+	    		var fileToPush = __dirname + directoryPrefix + fileNames[instrument];
+	    		console.log(fileToPush + ' is a ' + instrument);
+	    		pushSoundToClient(fileToPush, instrument, socket);
+	    		}
+	    	
+	    	/*
+	    	//old way
+	    	for (var i = 0; i < numberOfFilesToSend; i++) {
     			var nextFileName = fileNames[i];
     			console.log(nextFileName);
 	    		var fileToPush = __dirname + directoryPrefix + nextFileName;
 	    		console.log(fileToPush);
 	    		pushSoundToClient(fileToPush, i, socket);
 	    	}
+	    	*/
 	    	
 	    	
 	    	/*
@@ -372,6 +400,7 @@ function pushSoundToClient(filename, bufferIndex, socket) {
 			console.log("Error: " + err);
 		} else {
 			//console.log('audio index:' + bufferIndex);
+			//note: now sending instrument name instead of numerical index, but should still work...
 		    socket.emit('audio', { audio: true, buffer: buf, index: bufferIndex });
 		}
 	});

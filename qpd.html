@@ -144,6 +144,8 @@ socket.on('audio', function(msg){
     	audioFilesToReceive--;
     	if (audioFilesToReceive <= 0) {
     		console.log('all buffers loaded');
+    		//quick spot check
+    		//playBuffer('windchimes');
     		buffersAreLoaded = true;
     		initializeInstruments();
     		for (var i = 0; i < numberOfButtons; i++) {
@@ -282,11 +284,11 @@ function course3ButtonPressed() {
 					if (i == 0) {
 						startTime = 0;
 					} else {
-						startTime = Math.random() * 10.;
+						startTime = Math.random() * 5.;
 					}
 					var volume = Math.random() * 0.75 + 0.25;
-					var duration = Math.random() * 20.0 + 10.0;
-					var offset = Math.random() * 15.0;
+					var duration = Math.random() * 10.0 + 10.0;
+					var offset = Math.random() * 25.0;
 					//startDelay, note, volume, duration, offset (into buffer)
 					biteChimes.playNote(startTime, noteToPlay, volume, duration, offset);
 				}
@@ -380,31 +382,31 @@ function initializeInstruments() {
 	//81/80 (160/81)
 
 	//baseFreq 698.456463 Hz is MIDI note 77 (a high F)
-	piano = new MIDIInstrument(audioBuffers[3], 698.456463, 0.01, 0.1);
+	piano = new MIDIInstrument(audioBuffers.piano, 698.456463, 0.01, 0.1);
 	piano.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 12/7, 16/9, 64/33];
 	piano.basePitchForRetuning = 0;
 	piano.connect(gainNode);
 	
 	//baseFreq 186Hz is MIDI note 54.093589 (a little sharp of F# below middle C)
-	nyatiti = new MIDIInstrument(audioBuffers[2], 186., 0.01, 0.5);
+	nyatiti = new MIDIInstrument(audioBuffers.nyatiti, 186., 0.01, 0.5);
 	nyatiti.retuningMap = piano.retuningMap;
 	nyatiti.basePitchForRetuning = 0;
 	nyatiti.connect(gainNode);
 	
 	//baseFreq 523.251131 Hz is MIDI note 72 (C above middle C, not sure why wave file is mislabeled)
-	vibes = new MIDIInstrument(audioBuffers[0], 523.251131, 0.01, 0.5);
+	vibes = new MIDIInstrument(audioBuffers.vibes, 523.251131, 0.01, 0.5);
 	vibes.retuningMap = piano.retuningMap;
 	vibes.basePitchForRetuning = 0;
 	vibes.connect(gainNode);
 	
 	//baseFreq 698.456463 Hz is MIDI note 77 (a high F)
-	bitePiano = new MIDIInstrument(audioBuffers[3], 698.456463, 0.1, 0.1);
+	bitePiano = new MIDIInstrument(audioBuffers.piano, 698.456463, 0.1, 0.1);
 	bitePiano.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 12/7, 15/8, 64/33];
 	bitePiano.basePitchForRetuning = 0;
 	bitePiano.connect(biteGainNode);
 	
 	//arbitrarily deciding base note for chimes is A4
-	biteChimes = new MIDIInstrument(audioBuffers[4], 440., 0.15, 0.15);
+	biteChimes = new MIDIInstrument(audioBuffers.windchimes, 440., 2., 2.0);
 	biteChimes.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 12/7, 15/8, 64/33];
 	biteChimes.basePitchForRetuning = 0;
 	biteChimes.connect(biteFilterNode);
@@ -443,7 +445,7 @@ biteFilterNode.frequency.value = 10000;
 biteFilterNode.connect(biteGainNode);
 
 
-var audioBuffers = [];
+var audioBuffers = {};
 var buffersAreLoaded = false;
 
 </script>
