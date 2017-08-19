@@ -31,7 +31,6 @@ function Bite(instruments, currentScale) {
 		case 2:
 			
 			
-			
 			break;
 		case 3:
 			
