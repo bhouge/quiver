@@ -23,7 +23,12 @@ var fileNames = {
         nyatiti: "Kora1_F3_a.mp3",
         piano: "AplombPR_F01.mp3",
         windchimes: "windchimes.mp3",
-        marimba: "Marimba_D5.mp3"
+        marimba: "Marimba_D5.mp3",
+        rattle: "rattle.mp3",
+        vlaZing: "Viola_Zing_C5.mp3",
+        voice: "Voice_Ah_C#4.mp3",
+        accordionLow: "Accordion_Bass_C3.mp3",
+        accordionHigh: "Accordion_Thin_C3.mp3"
 };
 
 /*
