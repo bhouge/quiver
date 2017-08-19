@@ -143,6 +143,84 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 		timerID = window.setTimeout(finishedPlaying, duration * 1000.);
 	}
 	
+
+	this.playNoteWithFilter = function(msUntilStart, midiNote, volume, duration, startTime) {
+		//somewhere in here we should probably error check to make sure an outputNode with an audioContext is connected
+		//var newNow = that.outputNode.context.currentTime + 0.1;
+		//var pitchMultiplier = pitchClassToMultiplier(that.pitchArray[pitchIndex][0], that.pitchArray[pitchIndex][1]);
+		var audioBufferSource = that.outputNode.context.createBufferSource();
+		
+		//test
+		audioBufferSource.loop = true;
+		//holy cow, this is a perfect loop! You can bow the vibes forever! You are a genius!
+		//you are looping it for exactly one cycle, and I guess the vibes are perfectly in tune, makes sense
+		audioBufferSource.loopStart = 1.498089;
+		audioBufferSource.loopEnd = 1.5;
+		
+		
+		audioBufferSource.buffer = that.buffer;
+		var pitch = midiNoteToMultiplier(midiNote);
+		audioBufferSource.playbackRate.value = pitch;
+		var audioBufferGain = that.outputNode.context.createGain();
+		//audioBufferGain.gain.value = volume;
+		//audioBufferGain.gain.setValueAtTime(0., newNow);
+		//audioBufferGain.gain.setValueAtTime(0., that.outputNode.context.currentTime);
+
+		
+		var audioBufferFilter = that.outputNode.context.createBiquadFilter();
+		//audioBufferFilter.frequency.value = 10000;
+		audioBufferFilter.type = "lowshelf";
+		//audioBufferFilter.frequency.value = 1000;
+		audioBufferFilter.gain.value = 25;
+		audioBufferFilter.detune.value = 100;
+		audioBufferFilter.Q.value = 200; 
+		
+		audioBufferSource.connect(audioBufferFilter);
+		audioBufferFilter.connect(audioBufferGain);
+		audioBufferGain.connect(that.outputNode);
+		
+		
+		//seems goofy, but by scheduling everything slightly into the future (voluntarily adding latency),
+		//I was able to get rid of an ugly intermittent click (which randomly occurred even with no randomnessin parameters)
+		//Keep an eye on this value as you test on other devices...
+		//you could use this as a way to have different timing offsets for different devices...
+		//console.log("User-agent header sent: " + navigator.userAgent);
+		//maybe this could help? https://source.android.com/devices/audio/latency_measurements
+		var timeToStart = that.outputNode.context.currentTime + (msUntilStart / 1000.) + 0.1;
+		
+		//if duration is less than sum of fade times, scale fade times down proportionately
+		var fadeIn;
+		var fadeOut;
+		if ((that.fadeIn + that.fadeOut) > duration) {
+			var scalePercent = duration / (that.fadeIn + that.fadeOut);
+			fadeIn = that.fadeIn * scalePercent;
+			fadeOut = that.fadeOut * scalePercent;
+		} else {
+			fadeIn = that.fadeIn;
+			fadeOut = that.fadeOut;
+		}
+		
+		try {
+			audioBufferGain.gain.linearRampToValueAtTime(0.0, timeToStart);
+			audioBufferGain.gain.linearRampToValueAtTime(volume, timeToStart + fadeIn);
+			audioBufferGain.gain.linearRampToValueAtTime(volume, timeToStart + (duration - fadeOut));
+			audioBufferGain.gain.linearRampToValueAtTime(0.0, timeToStart + duration);
+			
+			
+			audioBufferFilter.frequency.linearRampToValueAtTime(500.0, timeToStart);
+			audioBufferFilter.frequency.linearRampToValueAtTime(10000, timeToStart + (duration * 0.5));
+			//audioBufferFilter.frequency.linearRampToValueAtTime(10000, timeToStart + (duration - fadeOut));
+			audioBufferFilter.frequency.linearRampToValueAtTime(500.0, timeToStart + duration);
+			
+			//unless there's something I'm missing here, duration (in start call) gets scaled with pitch, i.e., duration of buffer
+			//so if you want duration to not scale with pitch, you should multiply it by pitch, which I was not doing before.
+			audioBufferSource.start(timeToStart, startTime, duration * pitch);
+		} catch(e) {
+			alert(e);
+		}
+		timerID = window.setTimeout(finishedPlaying, duration * 1000.);
+	}
+	
 	//think about this...do you need a stop function?
 	//if you do, you need to hang on to every note you've launched keep track of when it ends to know what's playing
 	//so that you can send it a stop message
