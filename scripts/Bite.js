@@ -25,7 +25,7 @@ function Bite(instruments, currentScale) {
 			for (var i = 0; i < notes.length * 2; i++) {
 				var delay = Math.random() * 1000;
 				var octave = (i > 4) * 12;
-				this.instruments[0].playNote(i * 40, notes[i % notes.length] + octave, 1.0, 0.5, 0.1);
+				//this.instruments[0].playNote(i * 40, notes[i % notes.length] + octave, 1.0, 0.5, 0.1);
 			}
 			break;
 		case 2:

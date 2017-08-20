@@ -59,6 +59,7 @@ This web page will also work on a laptop (in which case inverting the device is 
 <script src="/socket.io/socket.io.js"></script>
 <script src="scripts/MIDIInstrument.js"></script>
 <script src="scripts/PhrasePlayer.js"></script>
+<script src="scripts/PulsatingTone.js"></script>
 <script src="scripts/Bite.js"></script>
 <script src="scripts/Plunk.js"></script>
 <script src="scripts/Evolve.js"></script>
@@ -167,6 +168,9 @@ var piano;
 var nyatiti;
 var vibes;
 var biteChimes;
+
+var leadingToneTuning = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 12/7, 16/9, 64/33];
+var mellowTuning = [1/1, 16/15, 9/8, 6/5, 5/4, 4/3, 10/7, 3/2, 8/5, 5/3, 16/9, 15/8];
 
 //would it make more sense to have these in an array?
 var course1Button = document.getElementById('course1');
@@ -288,11 +292,15 @@ function course3ButtonPressed() {
 					var duration = Math.random() * 10.0 + 10.0;
 					var offset = Math.random() * 25.0;
 					//startDelay, note, volume, duration, offset (into buffer)
-					nyatiti.playNote(startTime, noteToPlay, volume, duration, 0.);
+					//biteZing.playNote(startTime, noteToPlay, volume, duration, 0.);
 				}
 				nyatiti.playNote(0, 104, 1.0, 0.5, 0.1);
 				nyatiti.playNote(20, 105, 1.0, 0.5, 0.1);
 				nyatiti.playNote(40, 106, 1.0, 0.5, 0.1);
+				//buffer, minPause, maxPause, minVol, maxVol, minDur, maxDur, pitchArray, startWithPause, completionCallback
+				course3Music.tone = new PulsatingTone(audioBuffers.accordionLow, 0.01, 0.15, 0.05, 0.19, 0.05, 0.25, [[0,0]]);
+				course3Music.tone.connect(biteGainNode);
+				course3Music.tone.play(10.);
 				break;
 			case 4:
 				//pick how many notes
@@ -314,6 +322,70 @@ function course3ButtonPressed() {
 					var offset = Math.random() * 25.0;
 					//startDelay, note, volume, duration, offset (into buffer)
 					biteChimes.playNote(startTime, noteToPlay, volume, duration, offset);
+				}
+				//ok, here's the idea:
+				//create a phrase by generating the following
+				//notes (from set), intervals, volumes
+				//make notes spread out; something like if less than a 4th to last note, up an octave
+				//repeat x times, each time varying the parameters a bit and getting quieter
+				howManyNotes = Math.floor(Math.random() * 4) + 3;
+				var possibleNotes = [0, 2, 4, 5, 7, 9, 11];
+				var lastNote = 60;
+				var newPhrase = [];
+				var startTime = 0;
+				for (var i = 0; i < howManyNotes; i++) {
+					//Fisher-Yates shuffle, sorta
+					var randomIndex = Math.floor(Math.random() * (possibleNotes.length - i)) + i;
+					console.log('randomIndex: ' + randomIndex);
+					console.log('possibleNotes[randomIndex]: ' + possibleNotes[randomIndex]);
+					var previousValue = possibleNotes[i];
+					var noteToPlay = possibleNotes[randomIndex];
+					possibleNotes[i] = possibleNotes[randomIndex];
+					possibleNotes[randomIndex] = previousValue;
+					console.log('possibleNotes: ' + possibleNotes);
+					
+					noteToPlay += 60;
+					
+					if (Math.abs(noteToPlay - lastNote) < 5) {
+						noteToPlay += 12;
+					}
+					
+					//the lazy way to do it...
+					if (noteToPlay < 67)  {
+						noteToPlay += 12;
+					}
+					
+					
+					var volume = Math.random() * 0.5 + 0.5;
+					var duration = 3.0;
+					//var offset = Math.random() * 0.01 + 0.01;
+					var offset = 0;
+					//startDelay, note, volume, duration, offset (into buffer)
+					//instead of playing, write them to an array for future playback
+					//biteVoice.playNote(startTime, noteToPlay, volume, duration, offset);
+					newPhrase.push([startTime, noteToPlay, volume, duration, offset]);
+					lastNote = noteToPlay;
+					startTime+=(Math.random() * 500 + 250);
+				}
+				// note that startTime is now the duration of the whole phrase, handy!
+				console.log('look at my new phrase! ' + newPhrase);
+				console.log('length: ' + newPhrase.length);
+				var howManyReps = Math.floor(Math.random() * 3) + 2;
+				var humanizingDelay = 0;
+				for (var i = 0; i < howManyReps; i++) {
+					console.log('rep ' + (i + 1) + ' of ' + howManyReps);
+					for (var j = 0; j < newPhrase.length; j++) {
+						var newNote = newPhrase[j];
+						var starting = newNote[0] + (startTime * i) + humanizingDelay;
+						console.log('starting at ' + starting);
+						var humanizedVolume = (newNote[2] - Math.random() * 0.1) * Math.pow(0.75, i);
+						console.log('humanizedVolume: ' + humanizedVolume);
+						//this should be a small number that gradually gets bigger.
+						var offset = newNote[4] + (0.05 * i) * (Math.random() * 0.5 + 0.5);
+						bitePiano.playNote(starting, newNote[1], humanizedVolume, newNote[3], offset);
+						//so humanizing!
+						humanizingDelay += Math.random() * 250;
+					}
 				}
 				break;
 			case 5:
@@ -360,7 +432,7 @@ function course3ButtonPressed() {
 					} else {
 						startTime+=Math.random() * 1500.;
 					}
-					var volume = Math.random() * 0.75 + 0.25;
+					var volume = Math.random() * 0.35 + 0.15;
 					var duration = 7.5;
 					var offset = Math.random() * 0.5;
 					//startDelay, note, volume, duration, offset (into buffer)
@@ -456,46 +528,64 @@ function initializeInstruments() {
 
 	//baseFreq 698.456463 Hz is MIDI note 77 (a high F)
 	piano = new MIDIInstrument(audioBuffers.piano, 698.456463, 0.01, 0.1);
-	piano.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 12/7, 16/9, 64/33];
+	//piano.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 12/7, 16/9, 64/33];
+	piano.retuningMap = leadingToneTuning;
 	piano.basePitchForRetuning = 0;
 	piano.connect(gainNode);
 	
 	//baseFreq 186Hz is MIDI note 54.093589 (a little sharp of F# below middle C)
 	nyatiti = new MIDIInstrument(audioBuffers.nyatiti, 186., 0.01, 0.5);
-	nyatiti.retuningMap = piano.retuningMap;
+	nyatiti.retuningMap = leadingToneTuning;
 	nyatiti.basePitchForRetuning = 0;
 	nyatiti.connect(gainNode);
 	
 	//baseFreq 523.251131 Hz is MIDI note 72 (C above middle C, not sure why wave file is mislabeled)
 	vibes = new MIDIInstrument(audioBuffers.vibes, 523.251131, 0.01, 0.5);
-	vibes.retuningMap = piano.retuningMap;
+	vibes.retuningMap = leadingToneTuning;
 	vibes.basePitchForRetuning = 0;
 	vibes.connect(gainNode);
 	
 	//baseFreq 698.456463 Hz is MIDI note 77 (a high F)
 	bitePiano = new MIDIInstrument(audioBuffers.piano, 698.456463, 0.1, 0.1);
-	bitePiano.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 12/7, 15/8, 64/33];
+	//bitePiano.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 12/7, 7/11, 15/8];
+	bitePiano.retuningMap = mellowTuning;
 	bitePiano.basePitchForRetuning = 0;
 	bitePiano.connect(biteGainNode);
 	
 	//arbitrarily deciding base note for chimes is A4
 	biteChimes = new MIDIInstrument(audioBuffers.windchimes, 440., 2., 2.0);
-	biteChimes.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 12/7, 15/8, 64/33];
+	//biteChimes.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 12/7, 15/8, 64/33];
+	biteChimes.retuningMap = mellowTuning;
 	biteChimes.basePitchForRetuning = 0;
 	biteChimes.connect(biteGainNode);
 	
 	//arbitrarily deciding base note for rattle is also A4
 	biteRattle = new MIDIInstrument(audioBuffers.rattle, 440., 2., 2.0);
-	biteRattle.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 12/7, 15/8, 64/33];
+	//biteRattle.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 12/7, 15/8, 64/33];
+	biteRattle.retuningMap = mellowTuning;
 	biteRattle.basePitchForRetuning = 0;
 	biteRattle.connect(biteGainNode);
 	
 	//baseFreq 554.365262 Hz is MIDI note 73 (a high C#)
 	biteVoice = new MIDIInstrument(audioBuffers.voice, 554.365262, 2., 2.0);
-	biteVoice.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 5/3, 15/8, 64/33];
+	//biteVoice.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 5/3, 15/8, 64/33];
+	biteVoice.retuningMap = mellowTuning;
 	biteVoice.basePitchForRetuning = 0;
 	biteVoice.connect(biteGainNode);
 	
+	//baseFreq 523.251131 Hz is MIDI note 72 (C5)
+	biteZing = new MIDIInstrument(audioBuffers.vlaZing, 523.251131, 0.05, 0.1);
+	//biteZing.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 5/3, 15/8, 64/33];
+	biteZing.retuningMap = mellowTuning;
+	biteZing.basePitchForRetuning = 0;
+	biteZing.connect(biteGainNode);
+	
+	//baseFreq 587.329536 Hz is MIDI note 74 (D5)
+	biteMarimba = new MIDIInstrument(audioBuffers.marimba, 587.329536, 0.1, 0.1);
+	//biteMarimba.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 5/3, 15/8, 64/33];
+	biteMarimba.retuningMap = mellowTuning;
+	biteMarimba.basePitchForRetuning = 0;
+	biteMarimba.connect(gainNode);
 	
 	//setting up course3, since it is one persistent object that can be pressed manytimes...
 	course3Music = new Bite([bitePiano, biteChimes], [0, 2, 4, 5, 7, 9, 11]);
