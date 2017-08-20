@@ -28,7 +28,8 @@ var fileNames = {
         vlaZing: "Viola_Zing_C5.mp3",
         voice: "Voice_Ah_C#4.mp3",
         accordionLow: "Accordion_Bass_C3.mp3",
-        accordionHigh: "Accordion_Thin_C3.mp3"
+        accordionHigh: "Accordion_Thin_C3.mp3",
+        testCount: "testCount.mp3"
 };
 
 /*

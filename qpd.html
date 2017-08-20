@@ -62,6 +62,7 @@ This web page will also work on a laptop (in which case inverting the device is 
 <script src="scripts/PulsatingTone.js"></script>
 <script src="scripts/Bite.js"></script>
 <script src="scripts/Plunk.js"></script>
+<script src="scripts/Morph.js"></script>
 <script src="scripts/Evolve.js"></script>
 
 <script type="text/javascript">
@@ -235,24 +236,11 @@ function course1ButtonPressed() {
 function course2ButtonPressed() {
 	if (buffersAreLoaded) {
 		if (!course2Music.isPlaying) {
-			//course2Music = new Plunk(piano, 120., 4, 0, 3, 28, 28, course1MusicFinished);
-			//course2Music.playNote(2.2, 1., 1., 0.5);
-			//course2Music.play();
-			//var startTime = Math.random() * 10.0;
-			
-			//ok, pick this up later, encapsulate it...
-			//something wrong with envelope...
-			//also with multiple button presses (decide if this should be possible)
-			course2Music.isPlaying = true;
-			vibes.playNoteWithFilter(0, 60, 1., 10., 2.0);
-			
+			course2Music = new Morph(audioBuffers);
+			course2Music.play();
 			course2Button.innerHTML = 'STOP';
 		} else {
-			//window.clearTimeout(timerID);
-			//course2Music.stop();
-			//put this inside the object, so all you have to do is play/stop
-			course2Music.isPlaying = false;
-			//isChirping = false;
+			course2Music.stop();
 			course2Button.innerHTML = 'PLAY';
 		}
 	}

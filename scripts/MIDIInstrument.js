@@ -21,6 +21,9 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 	this.completionCallback = completionCallback;
 	this.basePitchForRetuning = 0;
 	this.retuningMap = [];
+	this.Q = 10.0;
+	this.filterGain = 25.0;
+	this.outputNode;
 	
 	// private variables
 	// Douglas Crockford told me to do this: http://www.crockford.com/javascript/private.html
@@ -154,11 +157,20 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 		audioBufferSource.loop = true;
 		//holy cow, this is a perfect loop! You can bow the vibes forever! You are a genius!
 		//you are looping it for exactly one cycle, and I guess the vibes are perfectly in tune, makes sense
-		audioBufferSource.loopStart = 1.498089;
-		audioBufferSource.loopEnd = 1.5;
+		//audioBufferSource.loopStart = 1.498089;
+		//audioBufferSource.loopEnd = 1.5;
+		
+		//bah, looks like these can't be changed with linearRampToValueAtTime, which would be pretty noisy anyway...
+		
+		var loopStart = Math.random() * 10.;
+		var loopDur = Math.random() * 0.1 + 0.025;
+		var loopEnd = loopStart + loopDur;
+		
+		audioBufferSource.loopStart = loopStart;
+		audioBufferSource.loopEnd = loopEnd;
 		
 		
-		audioBufferSource.buffer = that.buffer;
+		audioBufferSource.buffer = this.buffer;
 		var pitch = midiNoteToMultiplier(midiNote);
 		audioBufferSource.playbackRate.value = pitch;
 		var audioBufferGain = that.outputNode.context.createGain();
@@ -169,11 +181,11 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 		
 		var audioBufferFilter = that.outputNode.context.createBiquadFilter();
 		//audioBufferFilter.frequency.value = 10000;
-		audioBufferFilter.type = "lowshelf";
+		audioBufferFilter.type = "lowpass";
 		//audioBufferFilter.frequency.value = 1000;
-		audioBufferFilter.gain.value = 25;
-		audioBufferFilter.detune.value = 100;
-		audioBufferFilter.Q.value = 200; 
+		//audioBufferFilter.gain.value = 25.0;
+		//audioBufferFilter.detune.value = 100;
+		audioBufferFilter.Q.value = this.Q;
 		
 		audioBufferSource.connect(audioBufferFilter);
 		audioBufferFilter.connect(audioBufferGain);
@@ -181,7 +193,7 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 		
 		
 		//seems goofy, but by scheduling everything slightly into the future (voluntarily adding latency),
-		//I was able to get rid of an ugly intermittent click (which randomly occurred even with no randomnessin parameters)
+		//I was able to get rid of an ugly intermittent click (which randomly occurred even with no randomness in parameters)
 		//Keep an eye on this value as you test on other devices...
 		//you could use this as a way to have different timing offsets for different devices...
 		//console.log("User-agent header sent: " + navigator.userAgent);
@@ -200,21 +212,34 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 			fadeOut = that.fadeOut;
 		}
 		
+		console.log('fadeIn: ' + fadeIn + ';fadeOut: ' + fadeOut + '; duration: ' + duration);
+		
 		try {
 			audioBufferGain.gain.linearRampToValueAtTime(0.0, timeToStart);
 			audioBufferGain.gain.linearRampToValueAtTime(volume, timeToStart + fadeIn);
 			audioBufferGain.gain.linearRampToValueAtTime(volume, timeToStart + (duration - fadeOut));
 			audioBufferGain.gain.linearRampToValueAtTime(0.0, timeToStart + duration);
 			
+			audioBufferSource.playbackRate.exponentialRampToValueAtTime(1.0, timeToStart);
+			audioBufferSource.playbackRate.exponentialRampToValueAtTime(1.1, timeToStart + (duration * 0.5));
+			audioBufferSource.playbackRate.exponentialRampToValueAtTime(0.95, timeToStart + duration);
 			
-			audioBufferFilter.frequency.linearRampToValueAtTime(500.0, timeToStart);
-			audioBufferFilter.frequency.linearRampToValueAtTime(10000, timeToStart + (duration * 0.5));
+			audioBufferFilter.frequency.exponentialRampToValueAtTime(500.0, timeToStart);
+			//audioBufferFilter.frequency.exponentialRampToValueAtTime(15000, timeToStart + (duration * 0.35));
+			audioBufferFilter.frequency.exponentialRampToValueAtTime(20000, timeToStart + (duration * 0.5));
+			//audioBufferFilter.frequency.exponentialRampToValueAtTime(1000, timeToStart + (duration * 0.65));
 			//audioBufferFilter.frequency.linearRampToValueAtTime(10000, timeToStart + (duration - fadeOut));
-			audioBufferFilter.frequency.linearRampToValueAtTime(500.0, timeToStart + duration);
+			audioBufferFilter.frequency.exponentialRampToValueAtTime(500.0, timeToStart + duration);
 			
 			//unless there's something I'm missing here, duration (in start call) gets scaled with pitch, i.e., duration of buffer
 			//so if you want duration to not scale with pitch, you should multiply it by pitch, which I was not doing before.
-			audioBufferSource.start(timeToStart, startTime, duration * pitch);
+			console.log('pitch: ' + pitch + '; startTime: ' + startTime);
+			
+			//holy cow, I think this is a bug
+			//if the loop flag is set to true, the duration argument to start() behaves differently
+			//if false, duration is how much of the buffer to play (i.e., if pitch/speed is 1/2, play twice as much)
+			//if true, duration is in real time (ignore pitch, just stop after a certain amount of time)
+			audioBufferSource.start(timeToStart, loopStart, duration);
 		} catch(e) {
 			alert(e);
 		}
