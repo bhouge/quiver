@@ -130,7 +130,7 @@ function PulsatingTone(buffer, minPause, maxPause, minVol, maxVol, minDur, maxDu
 		playBuffer(that.buffer, volume, pitch, startTime, dur);
 		//var bufferDur = that.buffer.duration;
 		// not anymore, now I'm specifying this, right?
-		var bufferDur = that.dur;
+		var bufferDur = dur;
 		//console.log('startTimeInContext: ' + startTimeInContext + '; elapsed time: ' + that.outputNode.context.currentTime);
 		if (that.outputNode.context.currentTime < (startTimeInContext + that.duration)) {
 			var pauseDur = (that.maxPause - that.minPause) * interpolate(percentDone, that.pauseCurve) + that.minPause;

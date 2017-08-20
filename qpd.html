@@ -315,9 +315,74 @@ function course3ButtonPressed() {
 					var randomOctave = Math.floor(Math.random() * 3);
 					var hackyToneName = 'tone' + (i+1);
 					//buffer, minPause, maxPause, minVol, maxVol, minDur, maxDur, pitchArray, startWithPause, completionCallback
-					course3Music[hackyToneName] = new PulsatingTone(audioBuffers.accordionLow, 0.01, 0.2, 0.15, 0.6, 0.1, 0.333, 0.975, 1.025, [[randomOctave,noteToPlay]]);
+					course3Music[hackyToneName] = new PulsatingTone(audioBuffers.accordionHigh, 0.01, 0.2, 0.15, 0.6, 0.1, 0.333, 0.975, 1.025, [[randomOctave,noteToPlay]]);
 					course3Music[hackyToneName].connect(biteGainNode);
 					course3Music[hackyToneName].play(randomDur);
+				}
+				
+				//I hate myself not only for ripping off the behavior, but also for copying and pasting the code
+				//Nonetheless!
+				howManyNotes = Math.floor(Math.random() * 4) + 3;
+				var possibleNotes = [-1, 0, 1, 3, 4, 5, 6, 7, 8];
+				var lastNote = 60;
+				var newPhrase = [];
+				var startTime = 0;
+				for (var i = 0; i < howManyNotes; i++) {
+					//actually, repeated notes are ok for this, aren't they?
+					/*
+					var randomIndex = Math.floor(Math.random() * (possibleNotes.length - i)) + i;
+					console.log('randomIndex: ' + randomIndex);
+					console.log('possibleNotes[randomIndex]: ' + possibleNotes[randomIndex]);
+					var previousValue = possibleNotes[i];
+					var noteToPlay = possibleNotes[randomIndex];
+					possibleNotes[i] = possibleNotes[randomIndex];
+					possibleNotes[randomIndex] = previousValue;
+					console.log('possibleNotes: ' + possibleNotes);
+					*/
+					var noteToPlay = possibleNotes[Math.floor(Math.random() * possibleNotes.length)];
+					
+					//the lazy way to do it...
+					while (noteToPlay < 94)  {
+						noteToPlay += 12;
+					}
+					
+					var volume = Math.random() * 0.5 + 0.5;
+					var duration = 3.0;
+					//var offset = Math.random() * 0.01 + 0.01;
+					var offset = 0;
+					//startDelay, note, volume, duration, offset (into buffer)
+					//instead of playing, write them to an array for future playback
+					//biteVoice.playNote(startTime, noteToPlay, volume, duration, offset);
+					newPhrase.push([startTime, noteToPlay, volume, duration, offset]);
+					lastNote = noteToPlay;
+					//idea here is bursts of short, fast phrases to create a more disjunct rhythm
+					var slowBeat = Math.floor(Math.random() * 4);
+					if (slowBeat == 0) {
+						slowBeat = Math.random() * 500. + 650.;
+					} else {
+						slowBeat = 0;
+					}
+					startTime+=(Math.random() * 50 + 50 + slowBeat);
+				}
+				// note that startTime is now the duration of the whole phrase, handy!
+				console.log('look at my new phrase! ' + newPhrase);
+				console.log('length: ' + newPhrase.length);
+				var howManyReps = Math.floor(Math.random() * 3) + 2;
+				var humanizingDelay = 0;
+				for (var i = 0; i < howManyReps; i++) {
+					console.log('rep ' + (i + 1) + ' of ' + howManyReps);
+					for (var j = 0; j < newPhrase.length; j++) {
+						var newNote = newPhrase[j];
+						var starting = newNote[0] + (startTime * i) + humanizingDelay;
+						console.log('starting at ' + starting);
+						var humanizedVolume = (newNote[2] - Math.random() * 0.1) * Math.pow(0.75, i);
+						console.log('humanizedVolume: ' + humanizedVolume);
+						//this should be a small number that gradually gets bigger.
+						var offset = newNote[4] + (0.05 * i) * (Math.random() * 0.5 + 0.5);
+						biteZing.playNote(starting, newNote[1], humanizedVolume, newNote[3], offset);
+						//so humanizing!
+						humanizingDelay += Math.random() * 250;
+					}
 				}
 				
 				/*
@@ -602,7 +667,7 @@ function initializeInstruments() {
 	//baseFreq 523.251131 Hz is MIDI note 72 (C5)
 	biteZing = new MIDIInstrument(audioBuffers.vlaZing, 523.251131, 0.05, 0.1);
 	//biteZing.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 5/3, 15/8, 64/33];
-	biteZing.retuningMap = mellowTuning;
+	biteZing.retuningMap = leadingToneTuning;
 	biteZing.basePitchForRetuning = 0;
 	biteZing.connect(biteGainNode);
 	
