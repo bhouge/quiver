@@ -8,7 +8,7 @@
  * Optionally specify how far into the sample buffer to start reading (in percentage of overall duration) 
  * Supports microtonality with fractional MIDI notes, also with a remapping look-up table
  * Mono only for now (as this is designed to play back on a mobile phone)
- * Optional completion callback when note is finished
+ * Optional completion callback when note is finished (perhaps not implemented);
  */
 
 // creating an intermittentSound object with an object constructor
@@ -25,77 +25,16 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 	this.filterGain = 25.0;
 	this.outputNode;
 	
+	this.volumeCurve = [];
+	this.pitchCurve = [];
+	this.filterCurve = [];
+	
 	// private variables
 	// Douglas Crockford told me to do this: http://www.crockford.com/javascript/private.html
 	// It's a convention that allows private member functions to access the object
 	// due to an error in the ECMAScript Language Specification
 	var that = this;
 	var timerID;
-	
-	function midiNoteToMultiplier(midiNote) {
-		var multiplier;
-		//var scaleDegree = midiNote % 12;
-		var scaleDegree = ((midiNote + 12) - that.basePitchForRetuning) % 12;
-		//console.log('MIDI note ' + midiNote + ' is scale degree ' + scaleDegree);
-		var octave = Math.floor((midiNote - that.basePitchForRetuning) / 12);
-		//console.log('octave: ' + octave);
-		
-		var ratioToBaseNote;
-		if (that.retuningMap[scaleDegree]) {
-			ratioToBaseNote = that.retuningMap[scaleDegree];
-		} else {
-			ratioToBaseNote = Math.pow(2., scaleDegree / 12.);
-		}
-		//console.log('ratio of desired note to base note: ' + ratioToBaseNote);
-		
-		var scaleDegreeOfReferenceNote = (69 - that.basePitchForRetuning) % 12;
-		var octaveOfReferenceNote = Math.floor((69. - that.basePitchForRetuning) / 12.);
-		
-		var ratioOfReferenceToBaseNote;
-		if (that.retuningMap[scaleDegreeOfReferenceNote]) {
-			ratioOfReferenceToBaseNote = that.retuningMap[scaleDegreeOfReferenceNote];
-		} else {
-			ratioOfReferenceToBaseNote = Math.pow(2., scaleDegreeOfReferenceNote / 12.);
-		}
-		
-		//console.log('ratio of reference note to base note: ' + ratioOfReferenceToBaseNote);
-		
-		multiplier = ratioToBaseNote * ((440. / that.baseFreq) / ratioOfReferenceToBaseNote) * Math.pow(2., octave - octaveOfReferenceNote);
-		
-		//multiplier = Math.pow(2., (midiNote - 69.) / 12.) * (440. / that.baseFreq);
-		return multiplier;
-	}
-	
-	/*
-	function midiNoteToMultiplier(midiNote) {
-		var multiplier;
-		if (that.retuningMap.length > 0) {
-			console.log('There is a retuning map.');
-			var scaleDegree = (midiNote + that.basePitchForRetuning) % 12;
-			console.log('MIDI note ' + midiNote + ' is scale degree ' + scaleDegree + '.');
-			if (that.retuningMap[scaleDegree]) {
-				var scaleDegreeMultiplier = that.retuningMap[scaleDegree]; 
-				console.log('The multiplier is ' + scaleDegreeMultiplier + '.');
-				//this needs to get multiplied by
-				var octave = Math.floor(midiNote + that.basePitchForRetuning / 12.);
-				//multiplier = Math.pow(2., (midiNote - 69.) / 12.) * (440. / that.baseFreq);
-			} else {
-				multiplier = Math.pow(2., (midiNote - 69.) / 12.) * (440. / that.baseFreq);
-			}
-		} else {
-			multiplier = Math.pow(2., (midiNote - 69.) / 12.) * (440. / that.baseFreq);
-		}
-		return multiplier;
-	}
-	*/
-	
-	//Should fire when all notes are done?
-	function finishedPlaying() {
-		//console.log("Done!");
-		if (that.completionCallback) {
-			that.completionCallback();
-		}
-	}
 	
 	this.playNote = function(msUntilStart, midiNote, volume, duration, startTime) {
 		//somewhere in here we should probably error check to make sure an outputNode with an audioContext is connected
@@ -162,7 +101,7 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 		
 		//bah, looks like these can't be changed with linearRampToValueAtTime, which would be pretty noisy anyway...
 		
-		var loopStart = Math.random() * 10.;
+		var loopStart = Math.random() * 5.;
 		var loopDur = Math.random() * 0.1 + 0.025;
 		var loopEnd = loopStart + loopDur;
 		
@@ -200,36 +139,59 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 		//maybe this could help? https://source.android.com/devices/audio/latency_measurements
 		var timeToStart = that.outputNode.context.currentTime + (msUntilStart / 1000.) + 0.1;
 		
-		//if duration is less than sum of fade times, scale fade times down proportionately
-		var fadeIn;
-		var fadeOut;
-		if ((that.fadeIn + that.fadeOut) > duration) {
-			var scalePercent = duration / (that.fadeIn + that.fadeOut);
-			fadeIn = that.fadeIn * scalePercent;
-			fadeOut = that.fadeOut * scalePercent;
-		} else {
-			fadeIn = that.fadeIn;
-			fadeOut = that.fadeOut;
-		}
-		
-		console.log('fadeIn: ' + fadeIn + ';fadeOut: ' + fadeOut + '; duration: ' + duration);
-		
 		try {
-			audioBufferGain.gain.linearRampToValueAtTime(0.0, timeToStart);
-			audioBufferGain.gain.linearRampToValueAtTime(volume, timeToStart + fadeIn);
-			audioBufferGain.gain.linearRampToValueAtTime(volume, timeToStart + (duration - fadeOut));
-			audioBufferGain.gain.linearRampToValueAtTime(0.0, timeToStart + duration);
+			var fadeIn;
+			var fadeOut;
+			if (that.volumeCurve.length) {
+				for (var i = 0; i < that.volumeCurve.length; i++) {
+					var correspondingTime = duration * that.volumeCurve[i][0];
+					var correspondingValue = that.volumeCurve[i][1];
+					console.log('time: ' + correspondingTime + '; volume: ' + correspondingValue);
+					audioBufferGain.gain.linearRampToValueAtTime(correspondingValue, correspondingTime + timeToStart);
+				}
+			} else {
+				//if duration is less than sum of fade times, scale fade times down proportionately
+				//console.log('fadeIn: ' + fadeIn + ';fadeOut: ' + fadeOut + '; duration: ' + duration);
+				if ((that.fadeIn + that.fadeOut) > duration) {
+					var scalePercent = duration / (that.fadeIn + that.fadeOut);
+					fadeIn = that.fadeIn * scalePercent;
+					fadeOut = that.fadeOut * scalePercent;
+				} else {
+					fadeIn = that.fadeIn;
+					fadeOut = that.fadeOut;
+				}
+				audioBufferGain.gain.linearRampToValueAtTime(0.0, timeToStart);
+				audioBufferGain.gain.linearRampToValueAtTime(volume, timeToStart + fadeIn);
+				audioBufferGain.gain.linearRampToValueAtTime(volume, timeToStart + (duration - fadeOut));
+				audioBufferGain.gain.linearRampToValueAtTime(0.0, timeToStart + duration);
+			}
 			
-			audioBufferSource.playbackRate.exponentialRampToValueAtTime(1.0, timeToStart);
-			audioBufferSource.playbackRate.exponentialRampToValueAtTime(1.1, timeToStart + (duration * 0.5));
-			audioBufferSource.playbackRate.exponentialRampToValueAtTime(0.95, timeToStart + duration);
+			//audioBufferSource.playbackRate.exponentialRampToValueAtTime(1.0, timeToStart);
+			//audioBufferSource.playbackRate.exponentialRampToValueAtTime(1.1, timeToStart + (duration * 0.5));
+			//audioBufferSource.playbackRate.exponentialRampToValueAtTime(0.95, timeToStart + duration);
 			
+			//console.log('that.pitchCurve: ' + that.pitchCurve);
+			for (var i = 0; i < that.pitchCurve.length; i++) {
+				var correspondingTime = duration * that.pitchCurve[i][0];
+				var correspondingValue = that.pitchCurve[i][1];
+				console.log('time: ' + correspondingTime + '; pitch: ' + correspondingValue);
+				audioBufferSource.playbackRate.exponentialRampToValueAtTime(correspondingValue, correspondingTime + timeToStart);
+			}
+			
+			for (var i = 0; i < that.filterCurve.length; i++) {
+				var correspondingTime = duration * that.filterCurve[i][0];
+				var correspondingValue = that.filterCurve[i][1];
+				console.log('time: ' + correspondingTime + '; cutoff freq: ' + correspondingValue);
+				audioBufferFilter.frequency.exponentialRampToValueAtTime(correspondingValue, correspondingTime + timeToStart);
+			}
+			/*
 			audioBufferFilter.frequency.exponentialRampToValueAtTime(500.0, timeToStart);
 			//audioBufferFilter.frequency.exponentialRampToValueAtTime(15000, timeToStart + (duration * 0.35));
 			audioBufferFilter.frequency.exponentialRampToValueAtTime(20000, timeToStart + (duration * 0.5));
 			//audioBufferFilter.frequency.exponentialRampToValueAtTime(1000, timeToStart + (duration * 0.65));
 			//audioBufferFilter.frequency.linearRampToValueAtTime(10000, timeToStart + (duration - fadeOut));
 			audioBufferFilter.frequency.exponentialRampToValueAtTime(500.0, timeToStart + duration);
+			*/
 			
 			//unless there's something I'm missing here, duration (in start call) gets scaled with pitch, i.e., duration of buffer
 			//so if you want duration to not scale with pitch, you should multiply it by pitch, which I was not doing before.
@@ -246,6 +208,7 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 		timerID = window.setTimeout(finishedPlaying, duration * 1000.);
 	}
 	
+	
 	//think about this...do you need a stop function?
 	//if you do, you need to hang on to every note you've launched keep track of when it ends to know what's playing
 	//so that you can send it a stop message
@@ -258,6 +221,77 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 			this.isPlaying = false;
 			finishedPlaying();
 		}
+	}
+	
+
+	//Should fire when all notes are done?
+	function finishedPlaying() {
+		//console.log("Done!");
+		if (that.completionCallback) {
+			that.completionCallback();
+		}
+	}
+	
+
+	function midiNoteToMultiplier(midiNote) {
+		var multiplier;
+		//var scaleDegree = midiNote % 12;
+		var scaleDegree = ((midiNote + 12) - that.basePitchForRetuning) % 12;
+		//console.log('MIDI note ' + midiNote + ' is scale degree ' + scaleDegree);
+		var octave = Math.floor((midiNote - that.basePitchForRetuning) / 12);
+		//console.log('octave: ' + octave);
+		
+		var ratioToBaseNote;
+		if (that.retuningMap[scaleDegree]) {
+			ratioToBaseNote = that.retuningMap[scaleDegree];
+		} else {
+			ratioToBaseNote = Math.pow(2., scaleDegree / 12.);
+		}
+		//console.log('ratio of desired note to base note: ' + ratioToBaseNote);
+		
+		var scaleDegreeOfReferenceNote = (69 - that.basePitchForRetuning) % 12;
+		var octaveOfReferenceNote = Math.floor((69. - that.basePitchForRetuning) / 12.);
+		
+		var ratioOfReferenceToBaseNote;
+		if (that.retuningMap[scaleDegreeOfReferenceNote]) {
+			ratioOfReferenceToBaseNote = that.retuningMap[scaleDegreeOfReferenceNote];
+		} else {
+			ratioOfReferenceToBaseNote = Math.pow(2., scaleDegreeOfReferenceNote / 12.);
+		}
+		
+		//console.log('ratio of reference note to base note: ' + ratioOfReferenceToBaseNote);
+		
+		multiplier = ratioToBaseNote * ((440. / that.baseFreq) / ratioOfReferenceToBaseNote) * Math.pow(2., octave - octaveOfReferenceNote);
+		
+		//multiplier = Math.pow(2., (midiNote - 69.) / 12.) * (440. / that.baseFreq);
+		return multiplier;
+	}
+	
+
+	function interpolate(value, curve) {
+		//remember, expecting curve to be an array of breakpoints (i.e., two-element arrays)
+		//we should clip it on the ends...
+		//console.log('value: ' + value + '; curve: ' + curve + '; curve.length: ' + curve.length);
+		var interpolatedValue;
+		if (value < curve[0][0]) {
+			interpolatedValue = curve[0][1];
+		} else if (value > curve[curve.length - 1][0]) {
+			interpolatedValue = curve[curve.length - 1][1];
+		} else {
+			for (var i = 0; i < curve.length; i++) {
+				if (value < curve[i][0]) {
+					//console.log('value ' + value + ' is less than curve[i][0] ' + curve[i][0]);
+					//console.log('value - curve[i-1][0] is ' + (value - curve[i-1][0]));
+					//console.log('curve[i][0] - curve[i-1][0] is ' + (curve[i][0] - curve[i-1][0]));
+					var percentageThroughStage = (value - curve[i-1][0]) / (curve[i][0] - curve[i-1][0]);
+					//console.log('percentage through stage: ' + percentageThroughStage);
+					interpolatedValue = (percentageThroughStage * (curve[i][1] - curve[i-1][1])) + curve[i-1][1];
+					//console.log('interpolated value: ' + interpolatedValue);
+					return interpolatedValue;
+				}
+			}
+		}
+		return interpolatedValue;
 	}
 	
 	this.connect = function(nodeToConnectTo) {

@@ -29,29 +29,43 @@ function Morph(buffers) {
 	//scheduler variables
 	var schedulerTimerID;
 	
-	//baseFreq 523.251131 Hz is MIDI note 72 (C above middle C, not sure why wave file is mislabeled)
-	//that's fade in, fade out, right? Right
-	count = new MIDIInstrument(this.buffers.accordionLow, 440.0, 5., 5.);
-	count.Q = 10.;
-	//count.filterGain = 25.0;
-	//console.log(leadingToneTuning);
-	//this is kind of scary, relying not only on the definition of MIDIInstrument
-	//but also the definition of leadingToneTuning from the parent object...
-	//maybe there's a better way, but for now, let's just get it done!
-	count.retuningMap = leadingToneTuning;
-	count.basePitchForRetuning = 0;
-	count.connect(gainNode);
+	
 	
 	this.play = function() {
 		this.isPlaying = true;
 		
-		console.log('playing!');
+		//baseFreq 523.251131 Hz is MIDI note 72 (C above middle C, not sure why wave file is mislabeled)
+		//that's fade in, fade out, right? Right
+		//go back to accordionLow
+		accordion = new MIDIInstrument(this.buffers.accordionLow, 440.0, 5., 5.);
+		accordion.Q = 10.;
+		//count.filterGain = 25.0;
+		//console.log(leadingToneTuning);
+		//this is kind of scary, relying not only on the definition of MIDIInstrument
+		//but also the definition of leadingToneTuning from the parent object...
+		//maybe there's a better way, but for now, let's just get it done!
+		accordion.retuningMap = leadingToneTuning;
+		accordion.basePitchForRetuning = 0;
+		accordion.connect(gainNode);
+		
+		accordion.pitchCurve = generateRandomCurve(4, 8, 0.9, 1.2, 0.2);
+		//console.log('accordion pitchCurve: ' + accordion.pitchCurve);
+		
+		accordion.volumeCurve = generateRandomCurve(3, 6, 0.2, 1., 0.25, 0.);
+		//console.log('accordion volumeCurve: ' + accordion.volumeCurve);
+		
+		accordion.filterCurve = generateRandomCurve(3, 9, 500., 20000., 0.5, 500.);
+		
+		//console.log('playing!');
 		//ok, pick this up later, encapsulate it...
 		//something wrong with envelope...
 		//also with multiple button presses (decide if this should be possible)
 		//function(msUntilStart, midiNote, volume, duration, startTime)
 		var noteToPlay = Math.random() * 24.0 + 69.0;
-		count.playNoteWithFilter(100, noteToPlay, 0.4, 30., 1.45);
+		
+		//generate envelopes and attach them to count
+		
+		accordion.playNoteWithFilter(100, noteToPlay, 0.4, 30., 1.45);
 		
 		//schedulerTimerID = window.setTimeout(scheduler, timeToNextBeatSinceEpoch);
 	}
@@ -63,5 +77,44 @@ function Morph(buffers) {
 			//window.clearTimeout(schedulerTimerID);
 			this.isPlaying = false;
 		}
+	}
+	
+	function generateRandomCurve(minStages, maxStages, minValue, maxValue, stepPercent, startValue) {
+		//var newCurve = [[0.0, Math.random() * (maxValue - minValue) + minValue], 
+		//                [1.0, Math.random() * (maxValue - minValue) + minValue]];
+		console.log('minValue: ' + minValue + '; maxValue: ' + maxValue + '; stepPercent: ' + stepPercent);
+		var stepSize = stepPercent * (maxValue - minValue);
+		console.log('stepSize: ' + stepSize);
+		var newCurve = [];
+		var drunkValue;
+		if (typeof startValue != 'undefined') {
+			drunkValue = startValue;
+		} else {
+			drunkValue = Math.random() * (maxValue - minValue) + minValue;
+		}
+		console.log('initial drunkValue: ' + drunkValue);
+		var numberOfStages = Math.floor(Math.random() * (1 + maxStages - minStages)) + minStages;
+		for (var i = 0; i <= numberOfStages; i++) {
+			//console.log('i ' + i + ' is less than numberOfStages ' + numberOfStages);
+			var newX = i / numberOfStages;
+			var newY = drunkValue;
+			newCurve.push([newX, newY]);
+			var newDrunkValue = drunkValue + (2 * stepSize * Math.random()) - stepSize;
+			console.log('newDrunkValue: ' + newDrunkValue);
+			if (newDrunkValue > maxValue) {
+				drunkValue = maxValue - stepSize * Math.random();
+			} else if (newDrunkValue < minValue) {
+				drunkValue = minValue + stepSize * Math.random();
+			} else {
+				drunkValue = newDrunkValue;
+			}
+			console.log('drunkValue: ' + drunkValue);
+		}
+		newCurve.sort();
+		if (typeof startValue != 'undefined') {
+			newCurve[0][1] = startValue;
+			newCurve[newCurve.length-1][1] = startValue;
+		}
+		return newCurve;
 	}
 }
