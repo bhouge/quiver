@@ -294,13 +294,40 @@ function course3ButtonPressed() {
 					//startDelay, note, volume, duration, offset (into buffer)
 					//biteZing.playNote(startTime, noteToPlay, volume, duration, 0.);
 				}
-				nyatiti.playNote(0, 104, 1.0, 0.5, 0.1);
-				nyatiti.playNote(20, 105, 1.0, 0.5, 0.1);
-				nyatiti.playNote(40, 106, 1.0, 0.5, 0.1);
-				//buffer, minPause, maxPause, minVol, maxVol, minDur, maxDur, pitchArray, startWithPause, completionCallback
-				course3Music.tone = new PulsatingTone(audioBuffers.accordionLow, 0.01, 0.15, 0.05, 0.19, 0.05, 0.25, [[0,0]]);
-				course3Music.tone.connect(biteGainNode);
-				course3Music.tone.play(10.);
+				//nyatiti.playNote(0, 104, 1.0, 0.5, 0.1);
+				//nyatiti.playNote(20, 105, 1.0, 0.5, 0.1);
+				//nyatiti.playNote(40, 106, 1.0, 0.5, 0.1);
+				
+				
+				howManyNotes = Math.floor(Math.random() * 3) + 1;
+				var possibleNotes = [0, 2, 5, 7];
+				for (var i = 0; i < howManyNotes; i++) {
+					//Fisher-Yates shuffle
+					var randomIndex = Math.floor(Math.random() * (possibleNotes.length - i)) + i;
+					console.log('randomIndex: ' + randomIndex);
+					console.log('possibleNotes[randomIndex]: ' + possibleNotes[randomIndex]);
+					var previousValue = possibleNotes[i];
+					var noteToPlay = possibleNotes[randomIndex];
+					possibleNotes[i] = possibleNotes[randomIndex];
+					possibleNotes[randomIndex] = previousValue;
+					console.log('possibleNotes: ' + possibleNotes);
+					var randomDur = Math.random() * 10. + 10.;
+					var randomOctave = Math.floor(Math.random() * 3);
+					var hackyToneName = 'tone' + (i+1);
+					//buffer, minPause, maxPause, minVol, maxVol, minDur, maxDur, pitchArray, startWithPause, completionCallback
+					course3Music[hackyToneName] = new PulsatingTone(audioBuffers.accordionLow, 0.01, 0.2, 0.15, 0.6, 0.1, 0.333, 0.975, 1.025, [[randomOctave,noteToPlay]]);
+					course3Music[hackyToneName].connect(biteGainNode);
+					course3Music[hackyToneName].play(randomDur);
+				}
+				
+				/*
+				course3Music.tone1 = new PulsatingTone(audioBuffers.accordionLow, 0.01, 0.15, 0.05, 0.19, 0.125, 0.25, 0.975, 1.025, [[0,0]]);
+				course3Music.tone1.connect(biteGainNode);
+				course3Music.tone1.play(10.);
+				course3Music.tone2 = new PulsatingTone(audioBuffers.accordionLow, 0.01, 0.15, 0.05, 0.19, 0.125, 0.25, 0.975, 1.025, [[0,7]]);
+				course3Music.tone2.connect(biteGainNode);
+				course3Music.tone2.play(20.);
+				*/
 				break;
 			case 4:
 				//pick how many notes
@@ -354,7 +381,6 @@ function course3ButtonPressed() {
 					if (noteToPlay < 67)  {
 						noteToPlay += 12;
 					}
-					
 					
 					var volume = Math.random() * 0.5 + 0.5;
 					var duration = 3.0;
