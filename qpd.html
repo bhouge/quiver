@@ -226,6 +226,7 @@ var buttonStates = {
 var piano;
 var nyatiti;
 var vibes;
+var marimba;
 var biteChimes;
 
 var leadingToneTuning = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 12/7, 16/9, 64/33];
@@ -292,11 +293,13 @@ function course2ButtonPressed() {
 	if (buffersAreLoaded) {
 		if (!course2Music.isPlaying) {
 			//chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
-			var instrument = Math.floor(Math.random() * 2);
+			var instrument = Math.floor(Math.random() * 3);
 			if (instrument == 1) {
-				course2Music = new Plunk(piano, 120., 4, 0, 3, 28, 28, course1MusicFinished);
+				course2Music = new Plunk(piano, 120., 4, 0, 3, 28, 28, course2MusicFinished);
+			} else if (instrument == 2) {
+				course2Music = new Plunk(nyatiti, 120., 4, 0, 3, 28, 28, course2MusicFinished);
 			} else {
-				course2Music = new Plunk(nyatiti, 120., 4, 0, 3, 28, 28, course1MusicFinished);
+				course2Music = new Plunk(marimba, 120., 4, 0, 3, 28, 28, course2MusicFinished);
 			}
 			course2Music.play();
 			course2Button.innerHTML = 'STOP';
@@ -589,7 +592,7 @@ function course1MusicFinished() {
 }
 
 function course2MusicFinished() {
-	//course2Button.innerHTML = 'LISTEN';
+	course2Button.innerHTML = 'PLAY';
 }
 
 function course3MusicFinished() {
@@ -672,6 +675,13 @@ function initializeInstruments() {
 	vibes.retuningMap = leadingToneTuning;
 	vibes.basePitchForRetuning = 0;
 	vibes.connect(gainNode);
+	
+	//baseFreq 587.329536 Hz is MIDI note 74 (D5)
+	marimba = new MIDIInstrument(audioBuffers.marimba, 587.329536, 0.01, 0.1);
+	//biteMarimba.retuningMap = [1/1, 33/32, 9/8, 32/27, 5/4, 4/3, 40/27, 3/2, 8/5, 5/3, 15/8, 64/33];
+	marimba.retuningMap = leadingToneTuning;
+	marimba.basePitchForRetuning = 0;
+	marimba.connect(gainNode);
 	
 	//baseFreq 698.456463 Hz is MIDI note 77 (a high F)
 	bitePiano = new MIDIInstrument(audioBuffers.piano, 698.456463, 0.1, 0.1);

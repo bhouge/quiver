@@ -44,12 +44,14 @@ function PhrasePlayer(phrases, minPause, maxPause, minReps, maxReps, minVolleyPa
 			if (beatCountdown <= 0) {
 				//play the current note
 				var noteToPlay = this.phrases[currentPhraseIndex][noteIndex];
+				var endOfPhraseFlag;
 				console.log('currentNote: ' + noteToPlay);
 				//set beatCountdown to the current note's duration
 				beatCountdown = this.phrases[currentPhraseIndex][noteIndex][0];
 				//advance to the next note 
 				noteIndex++;
 				if (noteIndex >= this.phrases[currentPhraseIndex].length) {
+					console.log('noteIndex: ' + noteIndex + '; this.phrases[currentPhraseIndex].length: ' + this.phrases[currentPhraseIndex].length);
 					//if the next note doesn't exist, then decrement the number of phrase repeats 
 					volleyCountdown--;
 					if (volleyCountdown < 0) {
@@ -58,6 +60,7 @@ function PhrasePlayer(phrases, minPause, maxPause, minReps, maxReps, minVolleyPa
 						currentPhraseIndex = Math.floor(Math.random() * this.phrases.length);
 						volleyCountdown = Math.floor(Math.random() * (1 + this.maxReps - this.minReps)) + this.minReps;
 						console.log('new volleyCountdown: ' + volleyCountdown);
+						endOfPhraseFlag = true;
 						//and set the pause to the pause between volleys
 						beatCountdown = Math.floor((1 + that.maxVolleyPause - that.minVolleyPause) * Math.random()) + that.minVolleyPause;
 						//and also set the pause to the pause between phrases, since that stays steady for the whole volley
@@ -73,7 +76,17 @@ function PhrasePlayer(phrases, minPause, maxPause, minReps, maxReps, minVolleyPa
 						isPausing = true;
 					}
 				}
-				return noteToPlay;
+				console.log('noteToPlay: ' + noteToPlay);
+				//gah, this is dumb...
+				var copyOfNoteToPlay = [];
+				for (var i = 0; i < noteToPlay.length; i++) {
+					copyOfNoteToPlay[i] = noteToPlay[i];
+				}
+				if (endOfPhraseFlag) {
+					copyOfNoteToPlay.push(endOfPhraseFlag);
+				}
+				console.log('copyOfNoteToPlay: ' + copyOfNoteToPlay);
+				return copyOfNoteToPlay;
 			}
 		} else {
 			beatCountdown--;

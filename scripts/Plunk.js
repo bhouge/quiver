@@ -31,6 +31,7 @@ function Plunk(instrument, bpm, ticksPerBeat, minPause, maxPause, minReps, maxRe
 
 	//layer 1 variables
 	//let's define notes as metric duration (in beats), pitch (MIDI), volume (0-1), sounding duration
+	
 	var layer1Phrases = [
 	               [[1, 60, 1., 1], [1, 62, 0.8, 1], [2, 64, 0.5, 2], [1, 60, 0.35, 1], [2, 67, 1., 2], [1, 59, 0.65, 1]],
 	               [[1, 72, 1., 1], [1, 71, 0.8, 1], [2, 69, 0.5, 2], [1, 71, 0.35, 1], [2, 67, 1., 2], [1, 62, 0.65, 1]],
@@ -39,6 +40,10 @@ function Plunk(instrument, bpm, ticksPerBeat, minPause, maxPause, minReps, maxRe
 	               [[2, 64, 0.8, 2], [1, 65, 0.3, 1], [1, 66, 0.7, 1], [1, 67, 0.6, 1], [1, 66, 0.7, 1], [1, 67, 0.6, 1], [1, 66, 0.7, 1], [1, 67, 0.6, 1]],
 	               [[1, 69, 0.8, 1], [1, 67, 0.7, 1], [1, 64, 0.5, 1], [2, 67, 0.85, 2], [1, 69, 0.5, 1], [2, 64, 0.75, 2]]
 	               ];
+	               
+	
+	//ok, potentially very stupid, but let's give it a quick go...
+	//but first, get this synced response to button press working...
 	
 	var layer1 = new PhrasePlayer(layer1Phrases, 0, 0, 0, 0, 8, 12);
 	
@@ -89,7 +94,12 @@ function Plunk(instrument, bpm, ticksPerBeat, minPause, maxPause, minReps, maxRe
 			//var offset2 = Math.random() * 0.125;
 			var vol = noteToPlay[2];
 			instrument.playNote(msUntilBeat, note2Play + octave, vol, 0.5, offset);
+			if (noteToPlay.length >= 5) {
+				console.log('end of phrase, time to stop!');
+				that.stop();
+			}
 		}
+		/*
 		//layer 2
 		noteToPlay = layer2.beat();
 		if (noteToPlay) {
@@ -101,6 +111,7 @@ function Plunk(instrument, bpm, ticksPerBeat, minPause, maxPause, minReps, maxRe
 			var vol = noteToPlay[2];
 			instrument.playNote(msUntilBeat, note2Play + octave, vol, 0.5, offset);
 		}
+		*/
 	}
 	
 	this.play = function() {
