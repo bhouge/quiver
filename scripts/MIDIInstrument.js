@@ -29,6 +29,9 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 	this.pitchCurve = [];
 	this.filterCurve = [];
 	
+	this.loopStart = 0.5;
+	this.loopEnd = 0.51;
+	
 	// private variables
 	// Douglas Crockford told me to do this: http://www.crockford.com/javascript/private.html
 	// It's a convention that allows private member functions to access the object
@@ -101,13 +104,15 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 		
 		//bah, looks like these can't be changed with linearRampToValueAtTime, which would be pretty noisy anyway...
 		
-		var loopStart = Math.random() * 5.;
-		var loopDur = Math.random() * 0.1 + 0.025;
-		var loopEnd = loopStart + loopDur;
+		//make these properties to control from the outside...
+		//var loopStart = Math.random() * 5.;
+		//var loopDur = Math.random() * 0.1 + 0.025;
+		//var loopEnd = loopStart + loopDur;
 		
-		audioBufferSource.loopStart = loopStart;
-		audioBufferSource.loopEnd = loopEnd;
+		audioBufferSource.loopStart = this.loopStart;
+		audioBufferSource.loopEnd = this.loopStart + this.loopDur;
 		
+		//console.log('audioBufferSource.loopStart' + audioBufferSource.loopStart);
 		
 		audioBufferSource.buffer = this.buffer;
 		var pitch = midiNoteToMultiplier(midiNote);
@@ -146,7 +151,7 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 				for (var i = 0; i < that.volumeCurve.length; i++) {
 					var correspondingTime = duration * that.volumeCurve[i][0];
 					var correspondingValue = that.volumeCurve[i][1];
-					console.log('time: ' + correspondingTime + '; volume: ' + correspondingValue);
+					//console.log('time: ' + correspondingTime + '; volume: ' + correspondingValue);
 					audioBufferGain.gain.linearRampToValueAtTime(correspondingValue, correspondingTime + timeToStart);
 				}
 			} else {
@@ -174,14 +179,14 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 			for (var i = 0; i < that.pitchCurve.length; i++) {
 				var correspondingTime = duration * that.pitchCurve[i][0];
 				var correspondingValue = that.pitchCurve[i][1];
-				console.log('time: ' + correspondingTime + '; pitch: ' + correspondingValue);
+				//console.log('time: ' + correspondingTime + '; pitch: ' + correspondingValue);
 				audioBufferSource.playbackRate.exponentialRampToValueAtTime(correspondingValue, correspondingTime + timeToStart);
 			}
 			
 			for (var i = 0; i < that.filterCurve.length; i++) {
 				var correspondingTime = duration * that.filterCurve[i][0];
 				var correspondingValue = that.filterCurve[i][1];
-				console.log('time: ' + correspondingTime + '; cutoff freq: ' + correspondingValue);
+				//console.log('time: ' + correspondingTime + '; cutoff freq: ' + correspondingValue);
 				audioBufferFilter.frequency.exponentialRampToValueAtTime(correspondingValue, correspondingTime + timeToStart);
 			}
 			/*
@@ -195,13 +200,13 @@ function MIDIInstrument(buffer, baseFreq, fadeIn, fadeOut, completionCallback) {
 			
 			//unless there's something I'm missing here, duration (in start call) gets scaled with pitch, i.e., duration of buffer
 			//so if you want duration to not scale with pitch, you should multiply it by pitch, which I was not doing before.
-			console.log('pitch: ' + pitch + '; startTime: ' + startTime);
+			//console.log('pitch: ' + pitch + '; startTime: ' + startTime);
 			
 			//holy cow, I think this is a bug
 			//if the loop flag is set to true, the duration argument to start() behaves differently
 			//if false, duration is how much of the buffer to play (i.e., if pitch/speed is 1/2, play twice as much)
 			//if true, duration is in real time (ignore pitch, just stop after a certain amount of time)
-			audioBufferSource.start(timeToStart, loopStart, duration);
+			audioBufferSource.start(timeToStart, that.loopStart, duration);
 		} catch(e) {
 			alert(e);
 		}

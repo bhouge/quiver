@@ -211,22 +211,11 @@ function stopEverything() {
 function course1ButtonPressed() {
 	if (buffersAreLoaded) {
 		if (!course1Music.isPlaying) {
-			//chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
-			var instrument = Math.floor(Math.random() * 2);
-			if (instrument == 1) {
-				course1Music = new Plunk(piano, 120., 4, 0, 3, 28, 28, course1MusicFinished);
-			} else {
-				course1Music = new Plunk(nyatiti, 120., 4, 0, 3, 28, 28, course1MusicFinished);
-			}
-			
-			//course1Music.connect(gainNode);
-			course1Music.play();
-			//isChirping = true;
+			course1Music = new Morph(audioBuffers);
+			course1Music.play(180.);
 			course1Button.innerHTML = 'STOP';
 		} else {
-			//window.clearTimeout(timerID);
 			course1Music.stop();
-			//isChirping = false;
 			course1Button.innerHTML = 'PLAY';
 		}
 	}
@@ -236,7 +225,13 @@ function course1ButtonPressed() {
 function course2ButtonPressed() {
 	if (buffersAreLoaded) {
 		if (!course2Music.isPlaying) {
-			course2Music = new Morph(audioBuffers);
+			//chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
+			var instrument = Math.floor(Math.random() * 2);
+			if (instrument == 1) {
+				course2Music = new Plunk(piano, 120., 4, 0, 3, 28, 28, course1MusicFinished);
+			} else {
+				course2Music = new Plunk(nyatiti, 120., 4, 0, 3, 28, 28, course1MusicFinished);
+			}
 			course2Music.play();
 			course2Button.innerHTML = 'STOP';
 		} else {
@@ -253,15 +248,9 @@ function course3ButtonPressed() {
 		console.log(buttonPressed);
 		//remember, we're doing high to low, so sour, sweet, spicy
 		if (!course3Music.isPlaying) {
-			//chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
-			//course3Music = new IntermittentSound(audioBuffers[3], 0.145, 0.5, 10, 15, 0.5, 0.9, 0.1, 2.0, [[0,0]], false, course3MusicFinished);
-			//course3Music.connect(gainNode);
-			//course3Music.play();
-			
 			switch(buttonPressed) {
 			case 3:
 				course3Music.play(buttonPressed - 2);
-				//isChirping = true;
 				//pick how many notes
 				//pick what notes
 				//pick start times
@@ -285,8 +274,6 @@ function course3ButtonPressed() {
 				//nyatiti.playNote(0, 104, 1.0, 0.5, 0.1);
 				//nyatiti.playNote(20, 105, 1.0, 0.5, 0.1);
 				//nyatiti.playNote(40, 106, 1.0, 0.5, 0.1);
-				
-				
 				howManyNotes = Math.floor(Math.random() * 3) + 1;
 				var possibleNotes = [0, 2, 5, 7];
 				for (var i = 0; i < howManyNotes; i++) {
@@ -372,7 +359,6 @@ function course3ButtonPressed() {
 						humanizingDelay += Math.random() * 250;
 					}
 				}
-				
 				/*
 				course3Music.tone1 = new PulsatingTone(audioBuffers.accordionLow, 0.01, 0.15, 0.05, 0.19, 0.125, 0.25, 0.975, 1.025, [[0,0]]);
 				course3Music.tone1.connect(biteGainNode);
@@ -523,13 +509,10 @@ function course3ButtonPressed() {
 				//biteVoice.playNote(3000, 81, 1.0, 7.5, 0.1);
 				break;
 			}
-			
-			
 			//course3Button.innerHTML = 'STOP LISTENING';
 		} else {
 			//window.clearTimeout(timerID);
 			course3Music.stop();
-			//isChirping = false;
 			//course3Button.innerHTML = 'LISTEN';
 		}
 	}
