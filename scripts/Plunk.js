@@ -10,6 +10,8 @@ function Plunk(instrument, bpm, ticksPerBeat, minPause, maxPause, minReps, maxRe
 	//alert(this);
 	this.instrument = instrument;
 	this.msPerBeat = (60000. / (bpm * ticksPerBeat));
+	
+	this.pitchMultiplier = 1.;
 
 	this.isPlaying = false;
 	
@@ -99,13 +101,15 @@ function Plunk(instrument, bpm, ticksPerBeat, minPause, maxPause, minReps, maxRe
 		var noteToPlay;
 		noteToPlay = layer1.beat();
 		if (noteToPlay) {
+			//console.log('currentPitchMultiplier: ' + currentPitchMultiplier);
+			console.log('this.pitchMultiplier: ' + that.pitchMultiplier);
 			var note2Play = noteToPlay[1];
 			//var octave = (Math.floor(2 * Math.random()) + 1) * 12;
 			var octave = 0;
 			var offset = Math.random() * 0.125;
 			//var offset2 = Math.random() * 0.125;
 			var vol = noteToPlay[2];
-			instrument.playNote(msUntilBeat, note2Play + octave, vol, 0.5, offset);
+			instrument.playNote(msUntilBeat, (note2Play + octave) + that.pitchMultiplier, vol, 0.5, offset);
 			if (noteToPlay.length >= 5) {
 				console.log('end of phrase, time to stop!');
 				that.stop();

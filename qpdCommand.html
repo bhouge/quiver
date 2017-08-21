@@ -38,26 +38,23 @@ min/max volume<br>
 <input id="slider1" type="range" min="0" max="100" value="80" oninput="showSliderValuePercent(this)" />
 <input id="textField1" type="text" value="0.8" onchange="textFieldChangeValuePercent(this)" />
 <br>
-min/max pause between chirps (something like 0 to 5 seconds?)<br>
-<input id="slider2" type="range" min="0" max="100" value="10" oninput="showSliderValuePercent(this)" />
-<input id="textField2" type="text" value="0.1" onchange="textFieldChangeValuePercent(this)" />
+min/max reps in volley<br>
+<input id="slider2" type="range" min="0" max="10" value="2" oninput="showSliderValue(this)" />
+<input id="textField2" type="text" value="2" onchange="textFieldChangeValue(this)" />
 <br>
-<input id="slider3" type="range" min="0" max="100" value="25" oninput="showSliderValuePercent(this)" />
-<input id="textField3" type="text" value="0.25" onchange="textFieldChangeValuePercent(this)" />
+<input id="slider3" type="range" min="0" max="10" value="5" oninput="showSliderValue(this)" />
+<input id="textField3" type="text" value="5" onchange="textFieldChangeValue(this)" />
 <br>
-min/max pause between volleys (say, 0 to 10 seconds?)<br>
-<input id="slider4" type="range" min="0" max="100" value="45" oninput="showSliderValuePercent(this)" />
-<input id="textField4" type="text" value="0.45" onchange="textFieldChangeValuePercent(this)" />
+min/max pause between phrases in volley<br>
+<input id="slider4" type="range" min="0" max="10" value="2" oninput="showSliderValue(this)" />
+<input id="textField4" type="text" value="2" onchange="textFieldChangeValue(this)" />
 <br>
-<input id="slider5" type="range" min="0" max="100" value="75" oninput="showSliderValuePercent(this)" />
-<input id="textField5" type="text" value="0.75" onchange="textFieldChangeValuePercent(this)" />
+<input id="slider5" type="range" min="0" max="10" value="5" oninput="showSliderValue(this)" />
+<input id="textField5" type="text" value="5" onchange="textFieldChangeValue(this)" />
 <br>
-min/max chirps in volley<br>
-<input id="slider6" type="range" min="1" max="10" value="2" oninput="showSliderValue(this)" />
-<input id="textField6" type="text" value="2" onchange="textFieldChangeValue(this)" />
-<br>
-<input id="slider7" type="range" min="1" max="10" value="5" oninput="showSliderValue(this)" />
-<input id="textField7" type="text" value="5" onchange="textFieldChangeValue(this)" />
+transposition multiplier<br>
+<input id="slider6" type="range" min="0" max="24" value="0" oninput="showSliderValue(this)" />
+<input id="textField6" type="text" value="0" onchange="textFieldChangeValue(this)" />
 </div>
 
 <div id="commandButtons"></div>

@@ -266,7 +266,7 @@ io.on('connection', function(socket){
 			  buttonYesOrNo = false;
 		  }
 		  buttonStates[buttonName] = buttonYesOrNo;
-		  console.log('gonna send button states!');
+		  //console.log('gonna send button states!');
 		  io.emit('button states', buttonStates);
 	  } else {
 		  io.emit('control message', msg);
@@ -305,9 +305,9 @@ io.on('connection', function(socket){
 	    	
 	    	//send the audio files
 	    	for (var instrument in fileNames) {
-	    		console.log(fileNames[instrument]);
+	    		//console.log(fileNames[instrument]);
 	    		var fileToPush = __dirname + directoryPrefix + fileNames[instrument];
-	    		console.log(fileToPush + ' is a ' + instrument);
+	    		//console.log(fileToPush + ' is a ' + instrument);
 	    		pushSoundToClient(fileToPush, instrument, socket);
 	    		}
 	    	

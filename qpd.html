@@ -99,23 +99,28 @@ socket.on('control message', function(msg){
 						break;
 					case 2:
 						console.log('slider 2 value: ' + sliderFloatValue);
+						//minReps
 						//minChirpPause = maxChirpLimit * sliderFloatValue;
 						break;
 					case 3:
 						console.log('slider 3 value: ' + sliderFloatValue);
+						//maxReps
 						//maxChirpPause = maxChirpLimit * sliderFloatValue;
 						break;
 					case 4:
 						console.log('slider 4 value: ' + sliderFloatValue);
+						//minPause
 						//minVolleyPause = maxVolleyLimit * sliderFloatValue;
 						break;
 					case 5:
 						console.log('slider 5 value: ' + sliderFloatValue);
+						//maxPause
 						//maxVolleyPause = maxVolleyLimit * sliderFloatValue;
 						break;
 					case 6:
-						console.log('slider 6 value: ' + sliderIntValue);
-						//minChirps = sliderIntValue;
+						console.log('slider 6 value: ' + sliderFloatValue);
+						//transposition
+						course2Transposition = sliderFloatValue;
 						break;
 					case 7:
 						console.log('slider 7 value: ' + sliderIntValue);
@@ -126,7 +131,7 @@ socket.on('control message', function(msg){
 						break;
 				}
 			} else if (msgArray[msgArray.length-2] == 'button' && lastPart.length >= 2) {
-				console.log('Hopefully another part of the program is parsign that button.');
+				console.log('Hopefully another part of the program is parsing that button.');
 			} else {
 				console.log('Perhaps you have a malformed command message on your hands.');
 			}
@@ -261,6 +266,7 @@ var course5Music = { 'isPlaying' : false };
 
 //sigh, so dumb...
 var course2Instrument = Math.floor(Math.random() * 3);;
+var course2Transposition = 1.;
 
 //keeping this as a way to test sounds if needed
 function playBuffer(index) {
@@ -304,6 +310,7 @@ function course2ButtonPressed() {
 			} else {
 				course2Music = new Plunk(marimba, 120., 4, 0, 3, 28, 28, course2MusicFinished);
 			}
+			course2Music.pitchMultiplier = course2Transposition;
 			course2Music.play();
 			course2Button.innerHTML = 'STOP';
 		} else {
