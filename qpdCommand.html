@@ -20,6 +20,16 @@
 </head>
 <body>
 
+<div id="disableButtons">
+
+<button id="button1OnOff" value="active">button 1 active</button>
+<button id="button2OnOff" value="active">button 2 active</button>
+<button id="button3OnOff" value="active">button 3 active</button>
+<button id="button4OnOff" value="active">button 4 active</button>
+
+
+</div>
+
 <div class="sliders">
 min/max volume<br>
 <input id="slider0" type="range" min="0" max="100" value="70" oninput="showSliderValuePercent(this)" />
@@ -79,6 +89,57 @@ for (var i = 0; i <= 10; i++) {
 	commandButtons.appendChild(button);
 }
 
+var button1OnOff = document.getElementById('button1OnOff');
+button1OnOff.onclick = function() {
+	if (button1OnOff.value == 'active') {
+		button1OnOff.value = 'disabled';
+		button1OnOff.innerHTML = 'disabled';
+		emitControlMessage('/button/1 0');
+	} else {
+		button1OnOff.value = 'active';
+		button1OnOff.innerHTML = 'button 1 active';
+		emitControlMessage('/button/1 1');
+	}
+};
+
+var button2OnOff = document.getElementById('button2OnOff');
+button2OnOff.onclick = function() {
+	if (button2OnOff.value == 'active') {
+		button2OnOff.value = 'disabled';
+		button2OnOff.innerHTML = 'disabled';
+		emitControlMessage('/button/2 0');
+	} else {
+		button2OnOff.value = 'active';
+		button2OnOff.innerHTML = 'button 2 active';
+		emitControlMessage('/button/2 1');
+	}
+};
+
+var button3OnOff = document.getElementById('button3OnOff');
+button3OnOff.onclick = function() {
+	if (button3OnOff.value == 'active') {
+		button3OnOff.value = 'disabled';
+		button3OnOff.innerHTML = 'disabled';
+		emitControlMessage('/button/3 0');
+	} else {
+		button3OnOff.value = 'active';
+		button3OnOff.innerHTML = 'button 3 active';
+		emitControlMessage('/button/3 1');
+	}
+};
+
+var button4OnOff = document.getElementById('button4OnOff');
+button4OnOff.onclick = function() {
+	if (button4OnOff.value == 'active') {
+		button4OnOff.value = 'disabled';
+		button4OnOff.innerHTML = 'disabled';
+		emitControlMessage('/button/4 0');
+	} else {
+		button4OnOff.value = 'active';
+		button4OnOff.innerHTML = 'button 4 active';
+		emitControlMessage('/button/4 1');
+	}
+};
 
 function showSliderValue(sender)
 {

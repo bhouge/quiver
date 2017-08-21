@@ -29,8 +29,18 @@ var fileNames = {
         voice: "Voice_Ah_C#4.mp3",
         accordionLow: "Accordion_Bass_C3.mp3",
         accordionHigh: "Accordion_Thin_C3.mp3",
-        testCount: "testCount.mp3"
+        testing1: "testing1.mp3",
+        testing2: "testing2.mp3",
+        testing3: "testing3.mp3",
+        testing4: "testing4.mp3"
 };
+
+var buttonStates = {
+		button1: true,
+		button2: true,
+		button3: true,
+		button4: true
+}
 
 /*
  * old way...
@@ -235,7 +245,32 @@ io.on('connection', function(socket){
 	  //these are coming from the controller and going to all listeners
 	  //actually going to controllers, too; don't think this matters, but could potentially only target listeners
 	  console.log('control message: ' + msg);
-	  io.emit('control message', msg);
+	  var splitMSG = msg.split('/');
+	  var buttonID;
+	  var buttonValue;
+	  for (var i = 0; i < splitMSG.length; i++) {
+		  //avert your eyes!
+		  if (splitMSG[i] == 'button') {
+			  buttonID = splitMSG[i+1][0];
+			  buttonValue = splitMSG[i+1][2];
+			  break;
+		  }
+	  }
+	  //console.log('no splitMSG? ' + splitMSG);
+	  if (buttonID) {
+		  var buttonName = 'button' + buttonID;
+		  var buttonYesOrNo;
+		  if (buttonValue == '1') {
+			  buttonYesOrNo = true;
+		  } else {
+			  buttonYesOrNo = false;
+		  }
+		  buttonStates[buttonName] = buttonYesOrNo;
+		  console.log('gonna send button states!');
+		  io.emit('button states', buttonStates);
+	  } else {
+		  io.emit('control message', msg);
+	  }
   });
   socket.on('i am', function(msg){
 	    //console.log(msg);
@@ -264,6 +299,9 @@ io.on('connection', function(socket){
 	    	
 	    	//don't change this format! 'sending audio' is a specially formatted command!
 	    	socket.emit('sending audio', Object.keys(fileNames).length);
+	    	
+	    	//send button active state
+	    	socket.emit('button states', buttonStates);
 	    	
 	    	//send the audio files
 	    	for (var instrument in fileNames) {

@@ -56,6 +56,11 @@ Chrome or Firefox are the recommended browsers on Android devices.
 This web page will also work on a laptop (in which case inverting the device is not recommended).
 </h3>
 
+<div id="testButtonDiv">
+You can use this button to test audio on your device:<br>
+<button id="testButton" value="off" disabled>TEST</button>
+</div>
+
 <script src="/socket.io/socket.io.js"></script>
 <script src="scripts/MIDIInstrument.js"></script>
 <script src="scripts/PhrasePlayer.js"></script>
@@ -120,8 +125,10 @@ socket.on('control message', function(msg){
 						console.log('Not a valid slider.');
 						break;
 				}
+			} else if (msgArray[msgArray.length-2] == 'button' && lastPart.length >= 2) {
+				console.log('Hopefully another part of the program is parsign that button.');
 			} else {
-				console.log ('Perhaps you have a malformed command message on your hands.');
+				console.log('Perhaps you have a malformed command message on your hands.');
 			}
 		}
 	} else {
@@ -138,6 +145,34 @@ socket.on('sending audio', function(msg){
 	//alert('this many audio files: ' + msg);
 	audioFilesToReceive = msg;
 });
+socket.on('button states', function(msg){
+	//console.log('button states: ' + msg);
+	//alert('this many audio files: ' + msg);
+	buttonStates = msg;
+	if (buffersAreLoaded) {
+		for (button in buttonStates) {
+			console.log('key: ' + button + '; value: ' + buttonStates[button]);
+			var id = parseInt(button[button.length-1], 10);
+			console.log('id: ' + id);
+			switch(id) {
+			case 1:
+				course1Button.disabled = !buttonStates['button' + id];
+				break;
+			case 2:
+				course2Button.disabled = !buttonStates['button' + id];
+				break;
+			case 3:
+				course3Button.disabled = !buttonStates['button' + id];
+				course4Button.disabled = !buttonStates['button' + id];
+				course5Button.disabled = !buttonStates['button' + id];
+				break;
+			case 4:
+				testButton.disabled = !buttonStates['button' + id];
+				break;
+			}
+		} 
+	}
+});
 socket.on('audio', function(msg){
     console.log('audio received!');
     audioCtx.decodeAudioData(msg.buffer, function(buffer) {
@@ -153,8 +188,24 @@ socket.on('audio', function(msg){
     		for (var i = 0; i < numberOfButtons; i++) {
     			var courseButton = document.getElementById('course' + (i + 1));
     			//courseButton.innerHTML = 'LISTEN';
-    			courseButton.disabled = false;
+    			var buttonID;
+    			switch (i) {
+    			case 0:
+    				buttonID = 1;
+    				break;
+    			case 1:
+    				buttonID = 2;
+    				break;
+    			case 2:
+    			case 3:
+    			case 4:
+    				buttonID = 3;
+    				break;
+    			}
+    			courseButton.disabled = !buttonStates['button' + buttonID];
     		}
+    		testButton = document.getElementById('testButton');
+    		testButton.disabled = !buttonStates['button4'];
     	}
       }, 
       function(error) {
@@ -164,6 +215,13 @@ socket.on('audio', function(msg){
 
 var audioFilesToReceive = 0;
 var numberOfButtons = 5;
+
+var buttonStates = {
+		button1: true,
+		button2: true,
+		button3: true,
+		button4: true
+}
 
 var piano;
 var nyatiti;
@@ -180,11 +238,19 @@ var course3Button = document.getElementById('course3');
 var course4Button = document.getElementById('course4');
 var course5Button = document.getElementById('course5');
 
+var testButton = document.getElementById('testButton');
+
 course1Button.onclick = course1ButtonPressed;
 course2Button.onclick = course2ButtonPressed;
 course3Button.onclick = course3ButtonPressed;
 course4Button.onclick = course3ButtonPressed;
 course5Button.onclick = course3ButtonPressed;
+
+testButton.onclick = function() {
+	var testSoundID = Math.floor(Math.random() * 4) + 1;
+	var testSoundToPlay = 'testing' + testSoundID;
+	playBuffer(testSoundToPlay);
+}
 
 var course1Music = { 'isPlaying' : false };
 var course2Music = { 'isPlaying' : false };
