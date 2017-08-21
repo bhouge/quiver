@@ -258,7 +258,9 @@ var course2Music = { 'isPlaying' : false };
 var course3Music = { 'isPlaying' : false };
 var course4Music = { 'isPlaying' : false };
 var course5Music = { 'isPlaying' : false };
- 
+
+//sigh, so dumb...
+var course2Instrument = Math.floor(Math.random() * 3);;
 
 //keeping this as a way to test sounds if needed
 function playBuffer(index) {
@@ -293,7 +295,8 @@ function course2ButtonPressed() {
 	if (buffersAreLoaded) {
 		if (!course2Music.isPlaying) {
 			//chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
-			var instrument = Math.floor(Math.random() * 3);
+			var instrument = course2Instrument;
+			console.log('instrument is ' + course2Music.instrumentToUse);
 			if (instrument == 1) {
 				course2Music = new Plunk(piano, 120., 4, 0, 3, 28, 28, course2MusicFinished);
 			} else if (instrument == 2) {
