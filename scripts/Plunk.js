@@ -68,6 +68,13 @@ function Plunk(instrument, bpm, ticksPerBeat, minPause, maxPause, minReps, maxRe
 	//remember that transposition is in multiplier, make it hacky to keep it in tune...
 	var layer1 = new PhrasePlayer(layer1Phrases, this.minPause, this.maxPause, this.minReps, this.maxReps, 8, 12, true);
 	
+	console.log('plunk.minReps: ' + this.minReps);
+	console.log('plunk.maxReps: ' + this.maxReps);
+	
+	console.log('phrasePlayer.minReps: ' + layer1.minReps);
+	console.log('phrasePlayer.maxReps: ' + layer1.maxReps);
+	
+	
 	var layer2Phrases = [
 	               [[1, 48, 1., 1], [2, 50, 0.8, 1]],
 	               [[1, 47, 1., 1], [2, 48, 0.8, 1]],

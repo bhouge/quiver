@@ -92,30 +92,32 @@ socket.on('control message', function(msg){
 					case 0:
 						console.log('slider 0 value: ' + sliderFloatValue);
 						//minVol = sliderFloatValue;
+						course2minVol = sliderFloatValue;
+						
 						break;
 					case 1:
 						console.log('slider 1 value: ' + sliderFloatValue);
-						//maxVol = sliderFloatValue;
+						course2maxVol = sliderFloatValue;
 						break;
 					case 2:
 						console.log('slider 2 value: ' + sliderFloatValue);
 						//minReps
-						//minChirpPause = maxChirpLimit * sliderFloatValue;
+						course2minReps = sliderFloatValue;
 						break;
 					case 3:
 						console.log('slider 3 value: ' + sliderFloatValue);
 						//maxReps
-						//maxChirpPause = maxChirpLimit * sliderFloatValue;
+						course2maxReps = sliderFloatValue;
 						break;
 					case 4:
 						console.log('slider 4 value: ' + sliderFloatValue);
 						//minPause
-						//minVolleyPause = maxVolleyLimit * sliderFloatValue;
+						course2minPause = sliderFloatValue;
 						break;
 					case 5:
 						console.log('slider 5 value: ' + sliderFloatValue);
 						//maxPause
-						//maxVolleyPause = maxVolleyLimit * sliderFloatValue;
+						course2maxPause = sliderFloatValue;
 						break;
 					case 6:
 						console.log('slider 6 value: ' + sliderFloatValue);
@@ -309,6 +311,8 @@ function course2ButtonPressed() {
 			//chirpsRemaining = Math.floor(Math.random() * (1 + maxChirps - minChirps)) + minChirps;
 			var instrument = course2Instrument;
 			console.log('instrument is ' + course2Music.instrumentToUse);
+			console.log('course2minReps' + course2minReps);
+			console.log('course2maxReps' + course2minReps);
 			if (instrument == 1) {
 				course2Music = new Plunk(piano, 120., 4, course2minPause, course2maxPause, course2minReps, course2maxReps, course2MusicFinished);
 			} else if (instrument == 2) {
