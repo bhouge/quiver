@@ -37,15 +37,27 @@ function Plunk(instrument, bpm, ticksPerBeat, minPause, maxPause, minReps, maxRe
 	               [[1, 72, 1., 1], [1, 71, 0.8, 1], [2, 69, 0.5, 2], [1, 71, 0.35, 1], [2, 67, 1., 2], [1, 62, 0.65, 1]],
 	               [[2, 65, 0.8, 2], [1, 64, 0.5, 1], [1, 62, 0.9, 1], [1, 61, 0.25, 1], [1, 60, 1., 1], [1, 59, 1., 1], [1, 67, 0.65, 1]],
 	               [[2, 65, 0.7, 2], [1, 64, 0.5, 1], [2, 62, 0.8, 2]],
+	               [[2, 60, 0.7, 2], [1, 62, 0.5, 1], [2, 64, 0.8, 2]],
+	               [[2, 69, 0.7, 2], [1, 64, 0.5, 1], [2, 67, 0.8, 2]],
 	               [[2, 64, 0.8, 2], [1, 65, 0.3, 1], [1, 66, 0.7, 1], [1, 67, 0.6, 1], [1, 66, 0.7, 1], [1, 67, 0.6, 1], [1, 66, 0.7, 1], [1, 67, 0.6, 1]],
+	               [[2, 60, 0.8, 2], [1, 62, 0.3, 1], [1, 63, 0.7, 1], [1, 64, 0.6, 1], [1, 63, 0.7, 1], [1, 64, 0.6, 1], [1, 63, 0.7, 1], [1, 64, 0.6, 1]],
 	               [[1, 69, 0.8, 1], [1, 67, 0.7, 1], [1, 64, 0.5, 1], [2, 67, 0.85, 2], [1, 69, 0.5, 1], [2, 64, 0.75, 2]]
 	               ];
-	               
+	
 	
 	//ok, potentially very stupid, but let's give it a quick go...
-	//but first, get this synced response to button press working...
+	//min max number of notes (from server)
+	//want adjacent notes to be more likely, but consider this:
+	//don't want repeats, right?
+	//this is dumb, you'll never finish this and make it sound good by tonight
+	//let's manually add a bunch more, and let the probabilities change over time
+	//and add some transposition
+	//maybe sort by length, so we can globally control that (short ones, long ones...)
+	//yes, let us do this!
 	
-	var layer1 = new PhrasePlayer(layer1Phrases, 0, 0, 0, 0, 8, 12);
+	//also, vary number of reps and pause, sure...
+	//remember that transposition is in multiplier, make it hacky to keep it in tune...
+	var layer1 = new PhrasePlayer(layer1Phrases, 2, 5, 0, 3, 8, 12, true);
 	
 	var layer2Phrases = [
 	               [[1, 48, 1., 1], [2, 50, 0.8, 1]],

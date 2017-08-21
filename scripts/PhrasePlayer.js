@@ -8,7 +8,7 @@
  */
 
 // creating a PhrasePlayer object with an object constructor
-function PhrasePlayer(phrases, minPause, maxPause, minReps, maxReps, minVolleyPause, maxVolleyPause) {
+function PhrasePlayer(phrases, minPause, maxPause, minReps, maxReps, minVolleyPause, maxVolleyPause, randomWithinVolley) {
 	this.phrases = phrases;
 	this.minPause = minPause;
 	this.maxPause = maxPause;
@@ -67,7 +67,14 @@ function PhrasePlayer(phrases, minPause, maxPause, minReps, maxReps, minVolleyPa
 						//you could add a flag if this wasn't always designed to be the case...
 						pauseBetweenPhrasesForCurrentVolley = Math.floor((1 + that.maxPause - that.minPause) * Math.random()) + that.minPause;
 					} else {
-						beatCountdown = pauseBetweenPhrasesForCurrentVolley;
+						if (randomWithinVolley) {
+							//calculate again
+							beatCountdown = Math.floor((1 + that.maxPause - that.minPause) * Math.random()) + that.minPause
+							//should I reset beatCountdown? Any benefit?
+							//beatCountdown = pauseBetweenPhrasesForCurrentVolley;
+						} else {
+							beatCountdown = pauseBetweenPhrasesForCurrentVolley;
+						}
 					}
 					console.log('beatCountdown: ' + beatCountdown);
 					//regardless, reset noteIndex to the beginning
