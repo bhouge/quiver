@@ -11,8 +11,15 @@ function Plunk(instrument, bpm, ticksPerBeat, minPause, maxPause, minReps, maxRe
 	this.instrument = instrument;
 	this.msPerBeat = (60000. / (bpm * ticksPerBeat));
 	
+	this.minPause = minPause;
+	this.maxPause = maxPause;
+	this.minReps = minReps;
+	this.maxReps = maxReps;
+	
 	this.pitchMultiplier = 1.;
-
+	this.minVol = 0.5;
+	this.maxVol = 0.75;
+	
 	this.isPlaying = false;
 	
 	//I don't think I need this...
@@ -59,7 +66,7 @@ function Plunk(instrument, bpm, ticksPerBeat, minPause, maxPause, minReps, maxRe
 	
 	//also, vary number of reps and pause, sure...
 	//remember that transposition is in multiplier, make it hacky to keep it in tune...
-	var layer1 = new PhrasePlayer(layer1Phrases, 2, 5, 0, 3, 8, 12, true);
+	var layer1 = new PhrasePlayer(layer1Phrases, this.minPause, this.maxPause, this.minReps, this.maxReps, 8, 12, true);
 	
 	var layer2Phrases = [
 	               [[1, 48, 1., 1], [2, 50, 0.8, 1]],

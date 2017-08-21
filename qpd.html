@@ -267,6 +267,12 @@ var course5Music = { 'isPlaying' : false };
 //sigh, so dumb...
 var course2Instrument = Math.floor(Math.random() * 3);;
 var course2Transposition = 1.;
+var course2minVol = 0.5;
+var course2maxVol = 0.75;
+var course2minPause = 2;
+var course2maxPause = 5;
+var course2minReps = 0;
+var course2maxReps = 3;
 
 //keeping this as a way to test sounds if needed
 function playBuffer(index) {
@@ -304,13 +310,16 @@ function course2ButtonPressed() {
 			var instrument = course2Instrument;
 			console.log('instrument is ' + course2Music.instrumentToUse);
 			if (instrument == 1) {
-				course2Music = new Plunk(piano, 120., 4, 0, 3, 28, 28, course2MusicFinished);
+				course2Music = new Plunk(piano, 120., 4, course2minPause, course2maxPause, course2minReps, course2maxReps, course2MusicFinished);
 			} else if (instrument == 2) {
-				course2Music = new Plunk(nyatiti, 120., 4, 0, 3, 28, 28, course2MusicFinished);
+				course2Music = new Plunk(nyatiti, 120., 4, course2minPause, course2maxPause, course2minReps, course2maxReps, course2MusicFinished);
 			} else {
-				course2Music = new Plunk(marimba, 120., 4, 0, 3, 28, 28, course2MusicFinished);
+				course2Music = new Plunk(marimba, 120., 4, course2minPause, course2maxPause, course2minReps, course2maxReps, course2MusicFinished);
 			}
 			course2Music.pitchMultiplier = course2Transposition;
+			course2Music.minVol = course2minVol;
+			course2Music.maxVol = course2maxVol;
+			
 			course2Music.play();
 			course2Button.innerHTML = 'STOP';
 		} else {
