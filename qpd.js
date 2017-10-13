@@ -11,10 +11,6 @@ var listenerCount = 0;
 var supremeLeaderCount = 0;
 var mysteryUserCount = 0;
 
-//var birdFileGroups = [0, 8, 22, 29];
-
-//var birdFileGroups = [0, 3, 8, 13, 18, 23, 28, 33, 40, 45, 50, 53, 58, 63, 68, 73, 76];
-
 //ok, instead of an array with arbitrary indices, give each file a handy instrument name
 //that way, if you add or replace samples here, you don't need to change it on the receiving end
 var fileNames = {
@@ -42,171 +38,7 @@ var buttonStates = {
 		button4: true
 }
 
-/*
- * old way...
-var fileNames = ["BowedVibesC#5d.mp3",
-                   "CL_Swell_B4.mp3",
-                   "Kora1_F3_a.mp3",
-                   "AplombPR_F01.mp3",
-                   "windchimes.mp3"];
-                   */
-
-/*
-var birdFileNames = [
-                 	"snd_bird_barred_1.mp3",
-                	"snd_bird_barred_2.mp3",
-                	"snd_bird_barred_3.mp3",
-                	"snd_bird_barredowl_1.mp3",
-                	"snd_bird_barredowl_2.mp3",
-                	"snd_bird_barredowl_3.mp3",
-                	"snd_bird_barredowl_4.mp3",
-                	"snd_bird_barredowl_5.mp3",
-                	"snd_bird_bluejay_1.mp3",
-                	"snd_bird_bluejay_2.mp3",
-                	"snd_bird_bluejay_3.mp3",
-                	"snd_bird_bluejay_4.mp3",
-                	"snd_bird_bluejay_5.mp3",
-                	"snd_bird_catbird_1.mp3",
-                	"snd_bird_catbird_2.mp3",
-                	"snd_bird_catbird_3.mp3",
-                	"snd_bird_catbird_4.mp3",
-                	"snd_bird_catbird_5.mp3",
-                	"snd_bird_catbird_alt_1.mp3",
-                	"snd_bird_catbird_alt_2.mp3",
-                	"snd_bird_catbird_alt_3.mp3",
-                	"snd_bird_catbird_alt_4.mp3",
-                	"snd_bird_catbird_alt_5.mp3",
-                	"snd_bird_chickadee_06.mp3",
-                	"snd_bird_chickadee_07.mp3",
-                	"snd_bird_chickadee_08.mp3",
-                	"snd_bird_chickadee_1.mp3",
-                	"snd_bird_chickadee_2.mp3",
-                	"snd_bird_crow_1.mp3",
-                	"snd_bird_crow_2.mp3",
-                	"snd_bird_crow_3.mp3",
-                	"snd_bird_crow_4.mp3",
-                	"snd_bird_crow_5.mp3",
-                	"snd_bird_generic_1_1.mp3",
-                	"snd_bird_generic_1_2.mp3",
-                	"snd_bird_generic_1_3.mp3",
-                	"snd_bird_generic_1_4.mp3",
-                	"snd_bird_generic_1_5.mp3",
-                	"snd_bird_generic_1_6.mp3",
-                	"snd_bird_generic_1_7.mp3",
-                	"snd_bird_generic_2_1.mp3",
-                	"snd_bird_generic_2_2.mp3",
-                	"snd_bird_generic_2_3.mp3",
-                	"snd_bird_generic_2_4.mp3",
-                	"snd_bird_generic_2_5.mp3",
-                	"snd_bird_generic_3_1.mp3",
-                	"snd_bird_generic_3_2.mp3",
-                	"snd_bird_generic_3_3.mp3",
-                	"snd_bird_generic_3_4.mp3",
-                	"snd_bird_generic_3_5.mp3",
-                	"snd_bird_goose_1.mp3",
-                	"snd_bird_goose_2.mp3",
-                	"snd_bird_goose_3.mp3",
-                	"snd_bird_mourningdove_1.mp3",
-                	"snd_bird_mourningdove_2.mp3",
-                	"snd_bird_mourningdove_3.mp3",
-                	"snd_bird_mourningdove_4.mp3",
-                	"snd_bird_mourningdove_5.mp3",
-                	"snd_bird_robin_1.mp3",
-                	"snd_bird_robin_2.mp3",
-                	"snd_bird_robin_3.mp3",
-                	"snd_bird_robin_4.mp3",
-                	"snd_bird_robin_5.mp3",
-                	"snd_bird_screech_1.mp3",
-                	"snd_bird_screech_2.mp3",
-                	"snd_bird_screech_3.mp3",
-                	"snd_bird_screech_4.mp3",
-                	"snd_bird_screech_5.mp3",
-                	"snd_bird_titmouse_1.mp3",
-                	"snd_bird_titmouse_2.mp3",
-                	"snd_bird_titmouse_3.mp3",
-                	"snd_bird_titmouse_4.mp3",
-                	"snd_bird_titmouse_5.mp3",
-                	"snd_bird_woodpecker_1.mp3",
-                	"snd_bird_woodpecker_2.mp3",
-                	"snd_bird_woodpecker_3.mp3"];
-                     
-*/
-
-var peopleFileNames = [
-					"AVeryVineyPlant.mp3",
-					"AllGilfeather.mp3",
-					"AllThatsBrusselsSprouts.mp3",
-					"AnotherNineAcres.mp3",
-					"ButIfEverythingGoesWell.mp3",
-					"Butternut.mp3",
-					"CantHalfAss.mp3",
-					"DadLookAtThisOne.mp3",
-					"DigPotatoesInTheRain.mp3",
-					"DuringTheSummer.mp3",
-					"EndOfTheDay.mp3",
-					"FallCarrots.mp3",
-					"FieldFullOfWeeds.mp3",
-					"FrostEvent.mp3",
-					"GetWorkDone.mp3",
-					"ItsTheJob.mp3",
-					"LikeManyThingsThatWeGrow.mp3",
-					"LooseGreensEggplant.mp3",
-					"MostFarmsGrow.mp3",
-					"OnlySellToChefs.mp3",
-					"OrangeFleshSweetPotato.mp3",
-					"ParForTheCourse.mp3",
-					"PrettyFarApart.mp3",
-					"ReallyCoolVegetable.mp3",
-					"ReallyNiceWhiteFleshedTurnip.mp3",
-					"ReallyRareVegetable.mp3",
-					"SoSinceWeWannaDoItOrganic.mp3",
-					"SoWeMadeSure.mp3",
-					"SoYeahWePlanted.mp3",
-					"SpecializeInHeirlooms.mp3",
-					"TangibleResults.mp3",
-					"ThatsABigTurnip.mp3",
-					"TheseAreAllCuring.mp3",
-					"ThisBlockIsHeirloomRutabaga.mp3",
-					"ToughenedUp.mp3",
-					"TraditionalSweetPotato.mp3",
-					"TwiceAsMuchButternut.mp3",
-					"VeryPopular.mp3",
-					"Waldoboro.mp3",
-					"WaldoboroGreenNeck.mp3",
-					"WeGrewAbout.mp3",
-					"WeHaveMoreDemand.mp3",
-					"WeHaveToTransplantThis.mp3",
-					"WeLoveWhatWeDo.mp3",
-					"WePickThingsUp.mp3",
-					"WereRestaurantGrowers.mp3",
-					"WereTheOnlyFarmInTheUS.mp3"];
-
 var directoryPrefix = '/sounds/compressed/';
-//var birdDirectoryPrefix = 'various_birds';
-var birdDirectoryPrefix = 'BoroughVendors';
-var peopleDirectoryPrefix = 'various_people';
-
-var folderNameArray = [['chirps1', ['chirps1a.mp3',
-                                    'chirps1b.mp3',
-                                    'chirps1c.mp3']],
-                       ['chirps2', ['chirps2a.mp3',
-                                    'chirps2b.mp3',
-                                    'chirps2c.mp3']],
-					   ['chirps3', ['chirps3a.mp3',
-                                    'chirps3b.mp3',
-                                    'chirps3c.mp3']],
-                       ['chirps4', ['chirps4a.mp3',
-                                    'chirps4b.mp3',
-                                    'chirps4c.mp3',
-                                    'chirps4d.mp3']],
-                       ['chirps5', ['chirps5a.mp3',
-                                    'chirps5b.mp3',
-                                    'chirps5c.mp3']],
-];
-
-
-//var connections = {};
-//var tableID;
 
 app.get('/controller', function(req, res){
 	res.sendFile(__dirname + '/qpdCommand.html');
@@ -309,37 +141,7 @@ io.on('connection', function(socket){
 	    		var fileToPush = __dirname + directoryPrefix + fileNames[instrument];
 	    		//console.log(fileToPush + ' is a ' + instrument);
 	    		pushSoundToClient(fileToPush, instrument, socket);
-	    		}
-	    	
-	    	/*
-	    	//old way
-	    	for (var i = 0; i < numberOfFilesToSend; i++) {
-    			var nextFileName = fileNames[i];
-    			console.log(nextFileName);
-	    		var fileToPush = __dirname + directoryPrefix + nextFileName;
-	    		console.log(fileToPush);
-	    		pushSoundToClient(fileToPush, i, socket);
 	    	}
-	    	*/
-	    	
-	    	
-	    	/*
-	    	//what we did for ploughmans
-	    	var birdFileIndex = Math.floor(Math.random() * (birdFileGroups.length - 1));
-	    	//console.log('birdFileIndex: ' + birdFileIndex);
-	    	var birdGroupStartIndex = birdFileGroups[birdFileIndex];
-	    	//console.log('birdGroupStartIndex: ' + birdGroupStartIndex);
-	    	var numberOfBirdVariations = birdFileGroups[birdFileIndex + 1] - birdFileGroups[birdFileIndex];
-	    	//console.log('numberOfBirdVariations: ' + numberOfBirdVariations);
-	    	for (var i = 0; i < numberOfBirdVariations ; i++) {
-    			var nextFileName = birdFileNames[birdGroupStartIndex + i];
-    			//console.log(nextFileName);
-	    		var fileToPush = __dirname + directoryPrefix + birdDirectoryPrefix + '/' + nextFileName;
-	    		//console.log(fileToPush);
-	    		pushSoundToClient(fileToPush, i, socket);
-	    	}
-	    	*/
-	    	
 	    	
 	    	
 	    	//is this totally unused?
@@ -380,50 +182,7 @@ io.on('connection', function(socket){
 	    		peopleIndices[currentIndex] = swap;
 	    		//console.log("swapped value of " + randomIndex + " with value of " + currentIndex);
 	    	}
-	    	
-	    	//console.log(peopleIndices);
-	    	
-	    	/*
-	    	for (var i = 0; i < numberOfPeopleToLoad; i++) {
-	    		
-	    		//peopleFileNames;
-	    		var nextFileName = birdFileNames[birdGroupStartIndex + i];
-    			console.log(nextFileName);
-	    		var fileToPush = __dirname + directoryPrefix + birdDirectoryPrefix + '/' + nextFileName;
-	    		console.log(fileToPush);
-	    		pushSoundToClient(fileToPush, i, socket);
-	    	}
-	    	*/
-	    	
-	    	/*
-	    	//old way, prior to Michael's sound drop
-	    	//pick random folder
-	    	var randomFolderID = Math.floor(Math.random() * folderNameArray.length);
-	    	console.log(randomFolderID);
-	    	var randomFolderName = folderNameArray[randomFolderID][0];
-	    	console.log(randomFolderName);
-	    	var numberOfVariationsInRandomFolder = folderNameArray[randomFolderID][1].length;
-	    	console.log(numberOfVariationsInRandomFolder);
-	    	
-	    	
-    		for (var i = 0; i < numberOfVariationsInRandomFolder; i++) {
-    			var nextFileName = folderNameArray[randomFolderID][1][i];
-    			console.log(nextFileName);
-	    		var fileToPush = __dirname + directoryPrefix + randomFolderName + '/' + nextFileName;
-	    		console.log(fileToPush);
-	    		pushSoundToClient(fileToPush, i, socket);
-	    	}
-	    	*/
-	    	
-	    	//how the birds do it...
-	    	/*
-	    	for (var i = 1; i <= 29; i++) {
-	    		var randomFolder = folderNameArray[Math.floor(Math.random() * folderNameArray.length)];
-	    		var fileToPush = __dirname + directoryPrefix + randomFolder + '/Birds' + i + '.mp3';
-	    		pushSoundToClient(fileToPush, i, socket);
-	    	}
-	    	*/
-	    	
+	    		    	
 	    } else if (msg == 'supreme leader') {
 	    	socket.category = msg;
 	    	supremeLeaderCount++;
@@ -435,7 +194,6 @@ io.on('connection', function(socket){
   });
   socket.emit('get type', 'because you just connected!');
 });
-
 
 function pushSoundToClient(filename, bufferIndex, socket) {
 	//console.log('Pushing ' + filename + ' to buffer index ' + bufferIndex + ' on socket ' + socket);
@@ -449,7 +207,6 @@ function pushSoundToClient(filename, bufferIndex, socket) {
 		}
 	});
 }
-
 
 // is it possible that we could start listening and someone could connect before referenceTone is loaded?
 // let's start being systematic about this; 8300 for qpd, increments of 10 from there?
