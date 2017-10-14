@@ -143,45 +143,6 @@ io.on('connection', function(socket){
 	    		pushSoundToClient(fileToPush, instrument, socket);
 	    	}
 	    	
-	    	
-	    	//is this totally unused?
-	    	//what was this even for?
-	    	//I remember trying to implement a Fisher-Yates shuffle on the train to Barcelona...
-	    	
-	    	var numberOfPeopleToLoad;
-	    	if (peopleFileNames.length > 10) {
-	    		numberOfPeopleToLoad = 10;
-	    	} else {
-	    		numberOfPeopleToLoad = peopleFileNames.length;
-	    	}
-	    	
-	    	//generate numberOfPeopleToLoad unique indices within peopleFileNames...
-	    	//ok, implement that sorting algorithm...
-	    	//you should remember what it's called...Fisher-Yates!
-	    	var peopleIndices= [];
-	    	for (var i = 0; i < numberOfPeopleToLoad; i++) {
-	    		peopleIndices.push(i);
-	    	}
-	    	
-	    	//console.log(peopleIndices);
-	    	
-	    	for (var i = 0; i < numberOfPeopleToLoad; i++) {
-	    		//current index to swap, counting from the end
-	    		var currentIndex = (numberOfPeopleToLoad - 1) - i;
-	    		//console.log('currentIndex: ' + currentIndex);
-	    		//pick an index to swap with
-	    		var randomIndex = Math.floor(Math.random() * currentIndex);
-	    		//console.log('randomIndex: ' + randomIndex);
-	    		//could do a check to not do anything if you happened to have randomly picked the same index, 
-	    		//which is perfectly valid and there should then be no change
-	    		//store that value that is in that slot currently
-	    		var swap = peopleIndices[randomIndex];
-	    		//put the current index's value in that slot
-	    		peopleIndices[randomIndex] = peopleIndices[currentIndex];
-	    		//put the stored value in the current index's slot
-	    		peopleIndices[currentIndex] = swap;
-	    		//console.log("swapped value of " + randomIndex + " with value of " + currentIndex);
-	    	}
 	    		    	
 	    } else if (msg == 'supreme leader') {
 	    	socket.category = msg;

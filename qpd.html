@@ -21,37 +21,95 @@
     width: 50%;
     padding: 10px;
 	}
+
+#overlay {
+    position: fixed;
+    display: none;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.75);
+    z-index: 2;
+    cursor: pointer;
+}
+
+#upperLeft {
+	position: absolute; 
+	top: 0; 
+	left: 0; 
+	text-align: left;
+	color: red;
+}
+
+#upperRight {
+	position: absolute; 
+	top: 0; 
+	right: 0; 
+	text-align: right;
+	color: red;
+}
+
+#lowerLeft {
+	position: absolute; 
+	bottom: 0; 
+	left: 0; 
+	text-align: left;
+	color: red;
+}
+
+#lowerRight{
+	position: absolute; 
+	bottom: 0; 
+	right: 0; 
+	text-align: right;
+	color: red;
+}
+
+#text{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 50px;
+    color: white;
+    transform: translate(-50%,-50%);
+    -ms-transform: translate(-50%,-50%);
+}
 </style>
 </head>
 <body>
+
+<div id="overlay" onclick="off(event)">
+  <div id="upperLeft">BITTER</div>
+  <div id="upperRight">SPICY</div>
+  <div id="lowerLeft">SWEET</div>
+  <div id="lowerRight">SALTY</div>
+  <div id="text">HOW DOES IT TASTE?</div>
+</div>
+
 <h1>Quiver, Pop, and Dissolve: Three Essays in Gastromorphology (excerpt)</h1>
-<h2>by Ben Houge and Tracy Chang of Pagu</h2>
+<h2>Music and programming by Ben Houge</h2>
+<h2>Chocolate truffle mochis by Tracy Chang of Pagu</h2>
 
 <p>
-This project explores some of the different ways in which a meal can be considered as a time-based experience.
-There is the succession of courses, the entropy of each dish over time (flavors meld, temperatures equalize), 
+This project explores some of the different ways in which a meal can be considered as a time-based experience:
+the succession of courses, the entropy of each dish over time (flavors meld, temperatures equalize), 
 the rhythms of each bite, and the evolution and finish of flavor in the mouth.
 The term gastromorphology may be used to describe a meal as a function of time.
 </p>
 
 <div id="controlButtons">
-First Course: ADZUKI BEAN MOCHI<br>
+First Course: TRUFFLE PUG<br>
 <button id="course1" value="off" disabled>PLAY</button>
-<br><br>
-Second Course: MISO SOUP?<br>
-<button id="course2" value="off" disabled>PLAY</button>
-<br><br>
-Third Course: MONOCHROMATIC JELLIES<br>
-<button id="course3" class="button2" value="off" disabled>SOUR</button>
-<button id="course4" class="button2" value="off" disabled>SWEET</button>
-<button id="course5" class="button2" value="off" disabled>SPICY</button>
 </div>
 
 <h3>
-As you receive each new course, press the corresponding button below to trigger the musical accompaniment.
-Turn your phone upside down to help the sound propagate and tap the screen periodically 
-to keep it from going to sleep during the performance.
-Please ensure that your volume is turned up and that your phone is not in silent mode.
+When instructed, press the corresponding button below to trigger the musical accompaniment.
+Watch your screen for prompts, and keep your device from going to sleep during the performance.
+Please ensure that your volume is turned up and that your phone is not in silent mode,
+and turn your phone upside down to help the sound propagate.
 Chrome or Firefox are the recommended browsers on Android devices.
 This web page will also work on a laptop (in which case inverting the device is not recommended).
 </h3>
@@ -166,12 +224,12 @@ socket.on('button states', function(msg){
 				course1Button.disabled = !buttonStates['button' + id];
 				break;
 			case 2:
-				course2Button.disabled = !buttonStates['button' + id];
+				//course2Button.disabled = !buttonStates['button' + id];
 				break;
 			case 3:
-				course3Button.disabled = !buttonStates['button' + id];
-				course4Button.disabled = !buttonStates['button' + id];
-				course5Button.disabled = !buttonStates['button' + id];
+				//course3Button.disabled = !buttonStates['button' + id];
+				//course4Button.disabled = !buttonStates['button' + id];
+				//course5Button.disabled = !buttonStates['button' + id];
 				break;
 			case 4:
 				testButton.disabled = !buttonStates['button' + id];
@@ -221,7 +279,7 @@ socket.on('audio', function(msg){
 });
 
 var audioFilesToReceive = 0;
-var numberOfButtons = 5;
+var numberOfButtons = 1;
 
 var buttonStates = {
 		button1: true,
@@ -241,18 +299,18 @@ var mellowTuning = [1/1, 16/15, 9/8, 6/5, 5/4, 4/3, 10/7, 3/2, 8/5, 5/3, 16/9, 1
 
 //would it make more sense to have these in an array?
 var course1Button = document.getElementById('course1');
-var course2Button = document.getElementById('course2');
-var course3Button = document.getElementById('course3');
-var course4Button = document.getElementById('course4');
-var course5Button = document.getElementById('course5');
+//var course2Button = document.getElementById('course2');
+//var course3Button = document.getElementById('course3');
+//var course4Button = document.getElementById('course4');
+//var course5Button = document.getElementById('course5');
 
 var testButton = document.getElementById('testButton');
 
 course1Button.onclick = course1ButtonPressed;
-course2Button.onclick = course2ButtonPressed;
-course3Button.onclick = course3ButtonPressed;
-course4Button.onclick = course3ButtonPressed;
-course5Button.onclick = course3ButtonPressed;
+//course2Button.onclick = course2ButtonPressed;
+//course3Button.onclick = course3ButtonPressed;
+//course4Button.onclick = course3ButtonPressed;
+//course5Button.onclick = course3ButtonPressed;
 
 testButton.onclick = function() {
 	var testSoundID = Math.floor(Math.random() * 4) + 1;
@@ -261,10 +319,10 @@ testButton.onclick = function() {
 }
 
 var course1Music = { 'isPlaying' : false };
-var course2Music = { 'isPlaying' : false };
-var course3Music = { 'isPlaying' : false };
-var course4Music = { 'isPlaying' : false };
-var course5Music = { 'isPlaying' : false };
+//var course2Music = { 'isPlaying' : false };
+//var course3Music = { 'isPlaying' : false };
+//var course4Music = { 'isPlaying' : false };
+//var course5Music = { 'isPlaying' : false };
 
 //sigh, so dumb...
 var course2Instrument = Math.floor(Math.random() * 3);;
@@ -290,13 +348,15 @@ function stopEverything() {
 	//not sure we need to implement this for WAC 2017, but here's where you could...
 }
 
- 
+var timerID;
+
 function course1ButtonPressed() {
 	if (buffersAreLoaded) {
 		if (!course1Music.isPlaying) {
 			course1Music = new Morph(audioBuffers);
 			course1Music.play(180.);
 			course1Button.innerHTML = 'STOP';
+			timerID = window.setTimeout(popMeUp, 1.0 * 1000.0);
 		} else {
 			course1Music.stop();
 			course1Button.innerHTML = 'PLAY';
@@ -750,6 +810,43 @@ function initializeInstruments() {
 	
 	//setting up course3, since it is one persistent object that can be pressed manytimes...
 	course3Music = new Bite([bitePiano, biteChimes], [0, 2, 4, 5, 7, 9, 11]);
+}
+
+function popMeUp() {
+	//alert("quit it!");
+	on();
+}
+
+var overlayIsOn = false;
+var overlay = document.getElementById("overlay");
+overlay.addEventListener("touchstart", handleStart, false);
+
+function handleStart(evt) {
+	  evt.preventDefault();
+	  console.log("touchstart.");
+	  var touches = evt.changedTouches;
+	  alert(touches);
+	        
+	  for (var i = 0; i < touches.length; i++) {
+	    console.log("touchstart:" + i + "...");
+	    console.log("coordinates: x = " + touches[i].pageX + "; y = " + touches[i].pageY + ".");
+	    console.log("touchstart:" + i + ".");
+	  }
+	}
+
+function on() {
+    document.getElementById("overlay").style.display = "block";
+    overlayIsOn = true;
+}
+
+function off(event) {
+	//alert(event);
+	alert("coordinates: x = " + event.clientX + "; y = " + event.clientY + ".");
+    document.getElementById("overlay").style.display = "none";
+    overlayIsOn = false;
+    //do a check; if music is still playing
+    //if it's done, pop up "thank you for your participation.""
+    timerID = window.setTimeout(popMeUp, 5.0 * 1000.0);
 }
 
 //setting up our audio context and creating our master gain
