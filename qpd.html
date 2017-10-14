@@ -360,7 +360,8 @@ function course1ButtonPressed() {
 			course1Music = new Morph(audioBuffers);
 			course1Music.play(180.);
 			course1Button.innerHTML = 'STOP';
-			timerID = window.setTimeout(popMeUp, 1.0 * 1000.0);
+			var whenToPop = (20 + Math.random() * 20.) * 1000.0;
+		    timerID = window.setTimeout(popMeUp, whenToPop);
 			startTime = Date.now();
 		} else {
 			course1Music.stop();
@@ -843,7 +844,8 @@ function handleStart(evt) {
 	  }
 	  document.getElementById("overlay").style.display = "none";
 	  overlayIsOn = false;
-	  timerID = window.setTimeout(popMeUp, 10.0 * 1000.0);
+	  var whenToPop = (20 + Math.random() * 20.) * 1000.0;
+	  timerID = window.setTimeout(popMeUp, whenToPop);
 	}
 
 function on() {
@@ -863,7 +865,9 @@ function off(event) {
     overlayIsOn = false;
     //do a check; if music is still playing
     //if it's done, pop up "thank you for your participation.""
-    timerID = window.setTimeout(popMeUp, 5.0 * 1000.0);
+    //random timer every 20 to 40 seconds
+    var whenToPop = (20 + Math.random() * 20.) * 1000.0;
+    timerID = window.setTimeout(popMeUp, whenToPop);
 }
 
 var randomUserID = 'User' + Math.random();
