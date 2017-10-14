@@ -853,10 +853,11 @@ function on() {
 
 function off(event) {
 	//alert(event);
+	var timeSinceStart = Date.now() - startTime;
 	var xPercent = event.clientX / window.innerWidth;
 	var yPercent = event.clientY / window.innerHeight;
 	//alert("coordinates: x = " + xPercent + "; y = " + yPercent + ".");
-	socket.emit('tasteProfile', { 'userID' : randomUserID, 'x' : xPercent, 'y' : yPercent});
+	socket.emit('tasteProfile', { 'userID' : randomUserID, 'timeStamp' : timeSinceStart, 'x' : xPercent, 'y' : yPercent});
 	//alert("coordinates: x = " +  + "; y = " +  + ".");
     document.getElementById("overlay").style.display = "none";
     overlayIsOn = false;
