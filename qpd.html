@@ -832,6 +832,9 @@ function handleStart(evt) {
 	    console.log("coordinates: x = " + touches[i].pageX + "; y = " + touches[i].pageY + ".");
 	    console.log("touchstart:" + i + ".");
 	  }
+	  document.getElementById("overlay").style.display = "none";
+	  overlayIsOn = false;
+	  timerID = window.setTimeout(popMeUp, 5.0 * 1000.0);
 	}
 
 function on() {
