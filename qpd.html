@@ -107,7 +107,8 @@
 </div>
 
 <div id="thanks">
-<div id="text">Thanks for your participation!</div>
+<div id="text">Thanks for your participation! Read more at
+<a href="http://www.audiogustatory.com/">audiogustatory.com</a>.</div>
 </div>
 
 <h1>Quiver, Pop, and Dissolve: Three Essays in Gastromorphology (excerpt)</h1>
@@ -868,7 +869,7 @@ function handleStart(evt) {
 	  }
 	  document.getElementById("overlay").style.display = "none";
 	  overlayIsOn = false;
-	  var whenToPop = (20 + Math.random() * 20.) * 1000.0;
+	  var whenToPop = (20 + Math.random() * 10.) * 1000.0;
 	  timerID = window.setTimeout(popMeUp, whenToPop);
 	}
 
@@ -890,7 +891,7 @@ function off(event) {
     //do a check; if music is still playing
     //if it's done, pop up "thank you for your participation.""
     //random timer every 20 to 40 seconds
-    var whenToPop = (20 + Math.random() * 20.) * 1000.0;
+    var whenToPop = (20 + Math.random() * 10.) * 1000.0;
 	timerID = window.setTimeout(popMeUp, whenToPop);
 }
 
