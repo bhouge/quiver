@@ -42,6 +42,7 @@
 	left: 0; 
 	text-align: left;
 	color: red;
+	font-size: 50px;
 }
 
 #upperRight {
@@ -50,6 +51,7 @@
 	right: 0; 
 	text-align: right;
 	color: red;
+	font-size: 50px;
 }
 
 #lowerLeft {
@@ -58,6 +60,7 @@
 	left: 0; 
 	text-align: left;
 	color: red;
+	font-size: 50px;
 }
 
 #lowerRight{
@@ -66,6 +69,7 @@
 	right: 0; 
 	text-align: right;
 	color: red;
+	font-size: 50px;
 }
 
 #text{
@@ -831,11 +835,8 @@ function handleStart(evt) {
 	    //console.log("touchstart:" + i + "...");
 	    var xPercent = touches[i].pageX / window.innerWidth;
 	    var yPercent = touches[i].pageY / window.innerHeight;
-	    alert("coordinates: x = " + xPercent + "; y = " + yPercent + ".");
-	    socket.emit('tasteProfile', 
-	    		{ 'userID' : randomUserID, 
-	    		'x' : xPercent,
-	    		'y' : yPercent});
+	    //alert("coordinates: x = " + xPercent + "; y = " + yPercent + ".");
+	    socket.emit('tasteProfile', { 'userID' : randomUserID, 'x' : xPercent, 'y' : yPercent});
 	    //console.log("touchstart:" + i + ".");
 	  }
 	  document.getElementById("overlay").style.display = "none";
@@ -852,12 +853,9 @@ function off(event) {
 	//alert(event);
 	var xPercent = event.clientX / window.innerWidth;
 	var yPercent = event.clientY / window.innerHeight;
-	alert("coordinates: x = " + xPercent + "; y = " + yPercent + ".");
-	socket.emit('tasteProfile',
-			{ 'userID' : randomUserID, 
-	    	'x' : xPercent,
-	    	'y' : yPercent});
-	alert("coordinates: x = " +  + "; y = " +  + ".");
+	//alert("coordinates: x = " + xPercent + "; y = " + yPercent + ".");
+	socket.emit('tasteProfile', { 'userID' : randomUserID, 'x' : xPercent, 'y' : yPercent});
+	//alert("coordinates: x = " +  + "; y = " +  + ".");
     document.getElementById("overlay").style.display = "none";
     overlayIsOn = false;
     //do a check; if music is still playing
