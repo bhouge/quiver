@@ -104,6 +104,9 @@ io.on('connection', function(socket){
 		  io.emit('control message', msg);
 	  }
   });
+  socket.on('tasteProfile', function(msg) {
+	  console.log(msg);
+  });
   socket.on('i am', function(msg){
 	    //console.log(msg);
 	    //io.emit('message', msg);

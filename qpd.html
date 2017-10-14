@@ -829,7 +829,11 @@ function handleStart(evt) {
 	        
 	  for (var i = 0; i < touches.length; i++) {
 	    //console.log("touchstart:" + i + "...");
-	    alert("coordinates: x = " + touches[i].pageX + "; y = " + touches[i].pageY + ".");
+	    var xPercent = touches[i].pageX / window.innerWidth;
+	    var yPercent = touches[i].pageY / window.innerHeight;
+	    alert("coordinates: x = " + xPercent + "; y = " + yPercent + ".");
+	    socket.emit('tasteProfile', { 'x' : xPercent,
+	    					'y' : yPercent});
 	    //console.log("touchstart:" + i + ".");
 	  }
 	  document.getElementById("overlay").style.display = "none";
@@ -844,7 +848,7 @@ function on() {
 
 function off(event) {
 	//alert(event);
-	alert("coordinates: x = " + event.clientX + "; y = " + event.clientY + ".");
+	alert("coordinates: x = " + event.clientX / window.innerWidth + "; y = " + event.clientY / window.innerHeight + ".");
     document.getElementById("overlay").style.display = "none";
     overlayIsOn = false;
     //do a check; if music is still playing
