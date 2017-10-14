@@ -832,8 +832,10 @@ function handleStart(evt) {
 	    var xPercent = touches[i].pageX / window.innerWidth;
 	    var yPercent = touches[i].pageY / window.innerHeight;
 	    alert("coordinates: x = " + xPercent + "; y = " + yPercent + ".");
-	    socket.emit('tasteProfile', { 'x' : xPercent,
-	    					'y' : yPercent});
+	    socket.emit('tasteProfile', 
+	    		{ 'userID' : randomUserID, 
+	    		'x' : xPercent,
+	    		'y' : yPercent});
 	    //console.log("touchstart:" + i + ".");
 	  }
 	  document.getElementById("overlay").style.display = "none";
@@ -848,13 +850,23 @@ function on() {
 
 function off(event) {
 	//alert(event);
-	alert("coordinates: x = " + event.clientX / window.innerWidth + "; y = " + event.clientY / window.innerHeight + ".");
+	var xPercent = event.clientX / window.innerWidth;
+	var yPercent = event.clientY / window.innerHeight;
+	alert("coordinates: x = " + xPercent + "; y = " + yPercent + ".");
+	socket.emit('tasteProfile',
+			{ 'userID' : randomUserID, 
+	    	'x' : xPercent,
+	    	'y' : yPercent});
+	alert("coordinates: x = " +  + "; y = " +  + ".");
     document.getElementById("overlay").style.display = "none";
     overlayIsOn = false;
     //do a check; if music is still playing
     //if it's done, pop up "thank you for your participation.""
     timerID = window.setTimeout(popMeUp, 5.0 * 1000.0);
 }
+
+var randomUserID = 'User' + Math.random();
+alert(randomUserID);
 
 //setting up our audio context and creating our master gain
 var AudioContext = window.AudioContext || window.webkitAudioContext;
