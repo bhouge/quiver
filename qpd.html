@@ -361,6 +361,7 @@ function course1ButtonPressed() {
 			course1Music.play(180.);
 			course1Button.innerHTML = 'STOP';
 			timerID = window.setTimeout(popMeUp, 1.0 * 1000.0);
+			startTime = Date.now();
 		} else {
 			course1Music.stop();
 			course1Button.innerHTML = 'PLAY';
@@ -833,10 +834,11 @@ function handleStart(evt) {
 	        
 	  for (var i = 0; i < touches.length; i++) {
 	    //console.log("touchstart:" + i + "...");
+	    var timeSinceStart = Date.now() - startTime;
 	    var xPercent = touches[i].pageX / window.innerWidth;
 	    var yPercent = touches[i].pageY / window.innerHeight;
 	    //alert("coordinates: x = " + xPercent + "; y = " + yPercent + ".");
-	    socket.emit('tasteProfile', { 'userID' : randomUserID, 'x' : xPercent, 'y' : yPercent});
+	    socket.emit('tasteProfile', { 'userID' : randomUserID, 'timeStamp' : timeSinceStart, 'x' : xPercent, 'y' : yPercent});
 	    //console.log("touchstart:" + i + ".");
 	  }
 	  document.getElementById("overlay").style.display = "none";
@@ -864,7 +866,8 @@ function off(event) {
 }
 
 var randomUserID = 'User' + Math.random();
-alert(randomUserID);
+//alert(randomUserID);
+var startTime;
 
 //setting up our audio context and creating our master gain
 var AudioContext = window.AudioContext || window.webkitAudioContext;
