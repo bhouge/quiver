@@ -825,16 +825,16 @@ function handleStart(evt) {
 	  evt.preventDefault();
 	  console.log("touchstart.");
 	  var touches = evt.changedTouches;
-	  alert(touches);
+	  //alert(touches);
 	        
 	  for (var i = 0; i < touches.length; i++) {
-	    console.log("touchstart:" + i + "...");
-	    console.log("coordinates: x = " + touches[i].pageX + "; y = " + touches[i].pageY + ".");
-	    console.log("touchstart:" + i + ".");
+	    //console.log("touchstart:" + i + "...");
+	    alert("coordinates: x = " + touches[i].pageX + "; y = " + touches[i].pageY + ".");
+	    //console.log("touchstart:" + i + ".");
 	  }
 	  document.getElementById("overlay").style.display = "none";
 	  overlayIsOn = false;
-	  timerID = window.setTimeout(popMeUp, 5.0 * 1000.0);
+	  timerID = window.setTimeout(popMeUp, 10.0 * 1000.0);
 	}
 
 function on() {
