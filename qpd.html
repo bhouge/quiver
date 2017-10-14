@@ -35,6 +35,19 @@
     z-index: 2;
     cursor: pointer;
 }
+#thanks {
+    position: fixed;
+    display: none;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.75);
+    z-index: 2;
+    cursor: pointer;
+}
 
 #upperLeft {
 	position: absolute; 
@@ -91,6 +104,10 @@
   <div id="lowerLeft">SWEET</div>
   <div id="lowerRight">SALTY</div>
   <div id="text">HOW DOES IT TASTE?</div>
+</div>
+
+<div id="thanks">
+<div id="text">Thanks for your participation!</div>
 </div>
 
 <h1>Quiver, Pop, and Dissolve: Three Essays in Gastromorphology (excerpt)</h1>
@@ -358,9 +375,10 @@ function course1ButtonPressed() {
 	if (buffersAreLoaded) {
 		if (!course1Music.isPlaying) {
 			course1Music = new Morph(audioBuffers);
-			course1Music.play(180.);
+			course1Music.play(150., course1MusicFinished);
 			course1Button.innerHTML = 'STOP';
-			var whenToPop = (20 + Math.random() * 20.) * 1000.0;
+			//first pop up between 10 and 20 secs
+			var whenToPop = (10 + Math.random() * 10.) * 1000.0;
 		    timerID = window.setTimeout(popMeUp, whenToPop);
 			startTime = Date.now();
 		} else {
@@ -677,6 +695,7 @@ function course3ButtonPressed() {
 }
 
 function course1MusicFinished() {
+	alert('does this really work?');
 	//course1Button.innerHTML = 'LISTEN';
 }
 
@@ -820,7 +839,12 @@ function initializeInstruments() {
 
 function popMeUp() {
 	//alert("quit it!");
-	on();
+	if (course1Music.isPlaying) {
+		on();
+	} else {
+		//alert("thanks for your participation!");
+		document.getElementById("thanks").style.display = "block";
+	}
 }
 
 var overlayIsOn = false;
@@ -867,7 +891,7 @@ function off(event) {
     //if it's done, pop up "thank you for your participation.""
     //random timer every 20 to 40 seconds
     var whenToPop = (20 + Math.random() * 20.) * 1000.0;
-    timerID = window.setTimeout(popMeUp, whenToPop);
+	timerID = window.setTimeout(popMeUp, whenToPop);
 }
 
 var randomUserID = 'User' + Math.random();

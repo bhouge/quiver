@@ -19,6 +19,7 @@ function Morph(buffers) {
 	
 	this.isPlaying = false;
 	
+	this.completionCallback;
 	
 	// private variables
 	// Douglas Crockford told me to do this: http://www.crockford.com/javascript/private.html
@@ -46,7 +47,10 @@ function Morph(buffers) {
 		} else {
 			console.log('stopping!');
 			window.clearTimeout(schedulerTimerID);
-			this.isPlaying = false;
+			that.isPlaying = false;
+			if (that.completionCallback) {
+				that.completionCallback();
+			}
 		}
 	}
 	
@@ -120,9 +124,10 @@ function Morph(buffers) {
 		phrase.playNoteWithFilter(100, noteToPlay, 1.0, phraseDur, 1.45);
 	}
 	
-	this.play = function(dur) {
+	this.play = function(dur, callback) {
 		this.isPlaying = true;
 		totalDurationInSecs = dur;
+		this.completionCallback = callback;
 		timeAtStart = gainNode.context.currentTime;
 		playPhrase();
 		var timeUntilNextPhrase = Math.random() * 10000. + 10000.;
@@ -135,6 +140,7 @@ function Morph(buffers) {
 			console.log('stopping!');
 			window.clearTimeout(schedulerTimerID);
 			this.isPlaying = false;
+			this.completionCallback();
 		}
 	}
 	
